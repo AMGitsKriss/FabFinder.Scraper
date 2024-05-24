@@ -82,7 +82,7 @@ class HMScraper:
 
 	def load_products(self):
 		results = {}
-		products = self.file_manager.read_products(os.path.join(self.directory, "hm_all_products.json"))
+		products = self.file_manager.read_products(os.path.join(self.directory, "all_products.json"))
 		for p in products:
 			results[p] = "hm"
 		return results

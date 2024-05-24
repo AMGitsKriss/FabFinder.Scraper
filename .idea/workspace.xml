@@ -5,22 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ace769a8-fc7d-4ca4-aae0-176a86ef14ff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/FabFinder.Scraper.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/file_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/hm.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ms.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/program.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/setup.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tag_mapper.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/hm_test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/ms_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/file_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/file_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hm.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/hm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/program.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/program.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,9 +32,10 @@
     "Python tests.Python tests for hm_test.MyTestCase.test_tshirt.executor": "Debug",
     "Python.program.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+    "settings.editor.selected.configurable": "project.propVCSSupport.Confirmation"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -54,7 +43,7 @@
       <recent name="C:\Users\Kriss\Desktop\FabFinder Dev\FabFinder.Scraper\test" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Python tests for hm_test.MyTestCase.test_tshirt">
+  <component name="RunManager" selected="Python.program">
     <configuration name="Python tests for hm_test.MyTestCase.test_tshirt" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="FabFinder.Scraper" />
       <option name="ENV_FILES" value="" />
@@ -93,16 +82,35 @@
       <option name="presentableId" value="Default" />
       <updated>1716553513186</updated>
     </task>
+    <task id="LOCAL-00001" summary="Init">
+      <option name="closed" value="true" />
+      <created>1716556899000</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1716556899000</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Init" />
+    <option name="LAST_COMMIT_MESSAGE" value="Init" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/program.py</url>
-          <line>44</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/hm.py</url>
           <line>111</line>
@@ -112,6 +120,41 @@
           <url>file://$PROJECT_DIR$/src/hm.py</url>
           <line>157</line>
           <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/test/hm_test.py</url>
+          <line>22</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/file_manager.py</url>
+          <line>11</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/file_manager.py</url>
+          <line>21</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/program.py</url>
+          <line>29</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/program.py</url>
+          <line>19</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/program.py</url>
+          <line>37</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/hm.py</url>
+          <line>39</line>
+          <option name="timeStamp" value="16" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
