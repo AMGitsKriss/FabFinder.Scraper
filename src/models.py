@@ -28,8 +28,16 @@ class InventoryItem:
 	origin: str
 	creation_time: str
 
+
 @dataclass_json
 @dataclass
 class Category:
 	singular: str
 	plural: str
+
+
+@dataclass_json
+@dataclass
+class DetailRequestMsg:
+	store: str # HM / MS / ASOS
+	url: str
