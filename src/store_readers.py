@@ -5,10 +5,9 @@ import time
 
 from playwright.sync_api import sync_playwright, Page
 
-from file_manager import FileManager
 from hm import HMScraper
-from models import DetailRequestMsg
-from subscriber import RabbitSubscriber
+from models import DetailRequestMsg, CatalogueRequestMsg
+from rabbit_subscriber import RabbitSubscriber
 
 
 class LoopReader:
@@ -20,7 +19,7 @@ class LoopReader:
 			refresh_products = False
 			if refresh_products:
 				for store, scraper in scrapers.items():
-					scraper.refresh_all_products(window)
+					scraper.get_catalogue(window)
 
 			# make the pending-list global
 			remaining_product_urls = self.read_pending()
@@ -88,6 +87,21 @@ class RabbitReader:
 			# 	for store, scraper in scrapers.items():
 			# 		scraper.refresh_all_products(self.window)
 
+
+	def catalogue_callback(self, ch, method, properties, message_b):
+		message = CatalogueRequestMsg(**json.loads(message_b))
+		s = self.scrapers[message.store]
+		self.read_store_catalogue(self.window, s)
+
+	def read_store_catalogue(self, window: Page, scraper: HMScraper):
+		try:
+			scraper.get_catalogue(window)
+			return True
+		except Exception as ex:
+			store = type(scraper).__name__
+			logging.exception("Failed to read {store} catalogue.", store)
+			print(f"Failed to read {store} catalogue.")
+		return False
 
 	def details_callback(self, ch, method, properties, message_b):
 		message = DetailRequestMsg(**json.loads(message_b))

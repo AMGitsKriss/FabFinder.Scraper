@@ -1,7 +1,20 @@
+import json
 import logging
 import requests
 
 class TagMapper:
+
+	def resolve_tags(store_text: list[str]):
+		url = f"https://localhost:44357/ClothingMapper"
+		try:
+			response = requests.post(url, json=store_text, verify=not __debug__)
+			if (response.ok):
+				return response.json()
+			else:
+				logging.error("Mapper Service responded with {responseCode}. {url}", responseCode=response.status_code, url=url)
+		except:
+			logging.exception("Failed to read tags from the Mapper Service {url}", url=url)
+		return
 
 	def resolve_categories(title: str, store_categories: list[str]):
 		url = f"https://localhost:44357/Category?text={title} {', '.join(store_categories)}"

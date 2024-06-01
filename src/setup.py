@@ -8,8 +8,8 @@ class LogInstaller:
 	@staticmethod
 	def install():
 		seqlog.log_to_seq(
-			server_url="http://atlas:5341/",
-			api_key="lAr93RAGSr1iILEr1Kta",
+			server_url="http://localhost:5341/",
+			api_key="hXvwBIJLTrvAURu3kbnU",
 			level=logging.INFO,
 			batch_size=10,
 			auto_flush_timeout=10,  # seconds

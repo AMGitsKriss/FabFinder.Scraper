@@ -29,17 +29,19 @@ class HMScraper:
 	def get_page_url(self, url: str, page_no: int) -> str:
 		return f'{url}?sort=newProduct&page={page_no}'
 
-	def refresh_all_products(self, window: Page) -> list[str]:
+	def get_catalogue(self, window: Page) -> list[str]:
 		product_urls = []
 
 		for n, url in HMScraper.product_collections.items():
-			product_urls += self.refesh_category_products(window, url)
+			product_urls += self.refresh_category_products(window, url)
+			# Update the big product list after each collection iteration. We don't want an all-or-nothing update
 			self.file_manager.write_products(os.path.join(self.directory, "all_products.json"), product_urls)
 
 		print(f"Found {len(product_urls)} products.")
+
 		return product_urls
 
-	def refesh_category_products(self, window: Page, url: str) -> list[str]:
+	def refresh_category_products(self, window: Page, url: str) -> list[str]:
 		product_urls = []
 		page_no = 1
 
@@ -124,7 +126,6 @@ class HMScraper:
 				 window.locator(selectors["sizes"]).all()]
 
 		raw_colours = window.locator(selectors["available_colours"]).get_attribute("title").lower()
-		colour = TagMapper.resolve_colours([], re.split('[,/]', raw_colours))
 		image_urls = [image.get_attribute("src") for image in window.locator(selectors["images"]).all()]
 		image_urls += [image.get_attribute("content") for image in window.locator(selectors["cards"]).all()]
 
@@ -151,10 +152,17 @@ class HMScraper:
 		raw_categories += length
 		raw_categories.append(fit)
 		raw_categories.append(style)
-		categories = TagMapper.resolve_categories(title, raw_categories)
+		raw_categories.append(title)
+		mapper_response = TagMapper.resolve_tags(raw_categories)
 
+		categories = mapper_response.Categories.Tags
 		if len(categories) == 0:
-			logging.warning("The raw categories {categories} for product {url} did not map to anything we want to keep.", categories=raw_categories, url=url)
+			logging.warning("Product {url} did not map to any categories.", categories=raw_categories, url=url)
+			return None
+
+		colour = mapper_response.Colours.Tags
+		if len(colour) == 0:
+			logging.warning("Product {url} did not map to any colours.", categories=raw_categories, url=url)
 			return None
 
 		composition_detail = []

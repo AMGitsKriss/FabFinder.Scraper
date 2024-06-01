@@ -41,3 +41,9 @@ class Category:
 class DetailRequestMsg:
 	store: str # HM / MS / ASOS
 	url: str
+
+
+@dataclass_json
+@dataclass
+class CatalogueRequestMsg:
+	store: str # HM / MS / ASOS

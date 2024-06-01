@@ -5,11 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ace769a8-fc7d-4ca4-aae0-176a86ef14ff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/store_readers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/subscriber.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hm.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/hm.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/program.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/program.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store_readers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/store_readers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/subscriber.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbit_subscriber.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tag_mapper.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tag_mapper.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,19 +37,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python tests.Python tests for hm_test.MyTestCase.test_tshirt.executor": "Debug",
-    "Python.program.executor": "Debug",
-    "Python.rabbit_example.executor": "Debug",
-    "Python.rabbittest.executor": "Debug",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "settings.editor.selected.configurable": "project.propVCSSupport.Confirmation"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python tests.Python tests for hm_test.MyTestCase.test_tshirt.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.program.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.rabbit_example.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.rabbittest.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.Confirmation&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Kriss\Desktop\FabFinder Dev\FabFinder.Scraper\test" />
@@ -154,7 +156,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/hm.py</url>
-          <line>111</line>
+          <line>113</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -174,7 +176,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/hm.py</url>
-          <line>39</line>
+          <line>41</line>
           <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -183,8 +185,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/store_readers.py</url>
-          <line>94</line>
+          <line>108</line>
           <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/tag_mapper.py</url>
+          <line>16</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/tag_mapper.py</url>
+          <line>11</line>
+          <option name="timeStamp" value="31" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
