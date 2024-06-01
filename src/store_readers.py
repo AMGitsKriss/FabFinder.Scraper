@@ -7,7 +7,7 @@ from playwright.sync_api import sync_playwright, Page
 
 from hm import HMScraper
 from models import DetailRequestMsg, CatalogueRequestMsg
-from rabbit_subscriber import RabbitSubscriber
+from rabbit_subscriber import RabbitSubscriberBlocking
 
 
 class LoopReader:
@@ -65,6 +65,7 @@ class LoopReader:
 			print(f"Failed to parse page {url}")
 		return False
 
+
 class RabbitReader:
 	scrapers: dict[str, HMScraper]
 	window: Page
@@ -76,17 +77,19 @@ class RabbitReader:
 			browser = pw.chromium.launch(headless=False)
 			self.window = browser.new_page()
 
-			subscriber = RabbitSubscriber(self.details_callback)
+			subscriber = RabbitSubscriberBlocking(
+				read_catalogue=self.catalogue_callback,
+				read_product=self.details_callback
+			)
 			subscriber.start()
 
 			while subscriber.is_running():
 				time.sleep(5)
 
-			# refresh_products = False
-			# if refresh_products:
-			# 	for store, scraper in scrapers.items():
-			# 		scraper.refresh_all_products(self.window)
-
+		# refresh_products = False
+		# if refresh_products:
+		# 	for store, scraper in scrapers.items():
+		# 		scraper.refresh_all_products(self.window)
 
 	def catalogue_callback(self, ch, method, properties, message_b):
 		message = CatalogueRequestMsg(**json.loads(message_b))

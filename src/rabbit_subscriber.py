@@ -2,20 +2,44 @@ import pika
 from pika.adapters.select_connection import SelectConnection
 from pika.channel import Channel
 
-
-class RabbitSubscriber:
+class RabbitSubscriberBlocking:
 	connection: SelectConnection
 	channel: Channel
 
-	def __init__(self, callback):
+	def __init__(self, **callbacks):
+		self.connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+		self.channel = self.connection.channel()
+
+		for q_name in callbacks:
+			self.channel.basic_consume(queue=q_name,
+							  auto_ack=True,
+							  on_message_callback=callbacks[q_name])
+	def start(self):
+		self.channel.start_consuming()
+
+	def stop(self):
+		self.connection.close()
+
+	def is_running(self) -> bool:
+		return self.connection.is_open()
+
+class RabbitSubscriberNonBlock:
+	connection: SelectConnection
+	channel: Channel
+
+	def __init__(self, *callbacks):
 		self.connection = pika.SelectConnection(pika.ConnectionParameters('localhost'), on_open_callback=self.on_open)
-		self.callback = callback
+		self.callbacks = {}
+
+		for (q_name, callback) in callbacks:
+			self.callbacks[q_name] = callback
 
 	def on_open(self, connection):
 		connection.channel(on_open_callback=self.on_channel_open)
 
 	def on_channel_open(self, channel):
-		channel.basic_consume(queue='read_product', auto_ack=True, on_message_callback=self.callback)
+		for (q_name, callback) in self.callbacks:
+			channel.basic_consume(queue=q_name, auto_ack=True, on_message_callback=callback)
 
 	def start(self):
 		self.connection.ioloop.start()
