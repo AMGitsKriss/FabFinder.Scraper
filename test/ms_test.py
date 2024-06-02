@@ -1,10 +1,27 @@
+import urllib3
 from playwright.sync_api import sync_playwright
-from hm import *
 import unittest
+
+from file_manager import FileManager
+from ms import MSScraper
+from setup import LogInstaller
+
 
 # python -m unittest hm_test.MyTestCase.test_tshirt
 
 class MyTestCase(unittest.TestCase):
+	def setUp(self):
+		LogInstaller.install()
+		urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+		self.scraper = MSScraper(FileManager())
+
+	def test_catalogue_page(self):
+		with sync_playwright() as pw:
+			browser = pw.chromium.launch(headless=False)
+			context = browser.new_context(viewport={"width": 1280, "height": 720})
+			window = context.new_page()
+			product_list = self.scraper._MSScraper__refresh_page_products(window, "https://www.marksandspencer.com/l/men/mens-hoodies-and-sweatshirts#intid=gnav_Men_Clothing_Hoodies-and-Sweatshirts?page=1")
+		pass
 
 	def test_tshirt(self):
 		with sync_playwright() as pw:

@@ -1,27 +1,50 @@
+import os
 from datetime import datetime
+
+from file_manager import FileManager
 from models import *
 from playwright.sync_api import Page
 import re
 
-class HMScraper:
+from scraper import Scraper
 
+
+class MSScraper(Scraper):
+	directory = "../../DATA/stores/ms"
+	products_per_page = 48
+	base_url = 'https://www.marksandspencer.com'
 	product_collections = [
+		'https://www.marksandspencer.com/l/men/mens-hoodies-and-sweatshirts',
 		'https://www.marksandspencer.com/l/men/mens-jeans',
-		'https://www.marksandspencer.com/l/men/mens-tops',
-		'https://www.marksandspencer.com/l/men/mens-hoodies-and-sweatshirts'
+		'https://www.marksandspencer.com/l/men/mens-tops'
 	]
 
-	def get_page_url(self, url: str, page_no: int):
+	def __init__(self, file_manager: FileManager):
+		self.file_manager = file_manager
+
+	def get_catalogue(self, window: Page) -> list[str]:
+		product_urls = []
+
+		for n, url in self.product_collections.items():
+			product_urls += self.__refresh_category_products(window, url)
+			# Update the big product list after each collection iteration. We don't want an all-or-nothing update
+			self.file_manager.write_products(os.path.join(self.directory, "all_products.json"), product_urls)
+
+		print(f"Found {len(product_urls)} products.")
+
+		return product_urls
+
+	def __get_page_url(self, url: str, page_no: int):
 		return f'{url}?page={page_no}'
 
-	def get_all_products(self, window: Page):
+	def __refresh_category_products(self, window: Page, url: str) -> list[str]:
 		product_urls = []
 		page_no = 1
 
 		while True:
-			paginated_url = self.get_page_url(url, page_no)
+			paginated_url = self.__get_page_url(url, page_no)
 
-			results = list(self.get_page_products(window, paginated_url))
+			results = list(self.__refresh_page_products(window, paginated_url))
 			product_urls += results
 			page_no += 1
 
@@ -30,9 +53,9 @@ class HMScraper:
 
 		return product_urls
 
-	def get_page_products(self, window: Page, url: str):
+	def __refresh_page_products(self, window: Page, url: str):
 		product_grid = "div.grid_container__flAnn"
-		product_selector = "div.grid_container__flAnn a.product-card_linkWrapper__SfCy_"
+		product_selector = "div.grid_container__flAnn a[class^='product-card_linkWrapper']"
 
 		window.goto(url)  # go to url
 		window.wait_for_selector(product_grid)  # wait for content to load
@@ -42,7 +65,8 @@ class HMScraper:
 		product_boxes = window.locator(product_selector)
 		for box in product_boxes.all():
 			product_url = box.get_attribute("href")
-			products.append(product_url)
+			products.append(self.base_url + product_url)
+		products = set(products)
 
 		return products
 
@@ -97,7 +121,7 @@ class HMScraper:
 		if window.locator(selectors["fit"]).count() > 0: 
 			fit = window.locator(selectors["fit"]).text_content().strip().lower()
 
-		if window.locator(selectors["brand"]).count() > 0 and :
+		if window.locator(selectors["brand"]).count() > 0 and True:
 			brand = window.locator(selectors["brand"]).text_content().strip()
 
 		composition_detail = []

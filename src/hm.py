@@ -3,6 +3,7 @@ from datetime import datetime
 
 from file_manager import FileManager
 from models import *
+from scraper import Scraper
 from tag_mapper import *
 from playwright.sync_api import Page
 import re
@@ -11,7 +12,7 @@ import random
 import time
 
 
-class HMScraper:
+class HMScraper(Scraper):
 	directory = "../../DATA/stores/hm"
 	products_per_page = 36
 	product_collections = {
@@ -26,14 +27,11 @@ class HMScraper:
 	def __init__(self, file_manager: FileManager):
 		self.file_manager = file_manager
 
-	def get_page_url(self, url: str, page_no: int) -> str:
-		return f'{url}?sort=newProduct&page={page_no}'
-
 	def get_catalogue(self, window: Page) -> list[str]:
 		product_urls = []
 
-		for n, url in HMScraper.product_collections.items():
-			product_urls += self.refresh_category_products(window, url)
+		for n, url in self.product_collections.items():
+			product_urls += self.__refresh_category_products(window, url)
 			# Update the big product list after each collection iteration. We don't want an all-or-nothing update
 			self.file_manager.write_products(os.path.join(self.directory, "all_products.json"), product_urls)
 
@@ -41,12 +39,15 @@ class HMScraper:
 
 		return product_urls
 
-	def refresh_category_products(self, window: Page, url: str) -> list[str]:
+	def __get_page_url(self, url: str, page_no: int) -> str:
+		return f'{url}?sort=newProduct&page={page_no}'
+
+	def __refresh_category_products(self, window: Page, url: str) -> list[str]:
 		product_urls = []
 		page_no = 1
 
 		while True:
-			results = list(self.refresh_page_products(window, url, page_no))
+			results = list(self.__refresh_page_products(window, url, page_no))
 
 			product_urls += results
 			page_no += 1
@@ -56,12 +57,12 @@ class HMScraper:
 
 		return product_urls
 
-	def refresh_page_products(self, window: Page, url: str, page_no: int):
+	def __refresh_page_products(self, window: Page, url: str, page_no: int):
 		product_selector = "#products-listing-section ul li .splide ul li:first-of-type a"
 		page_no_selector = '#products-listing-section nav[role="navigation"] ul li a[aria-current="true"]'
 
 		# time.sleep(random.randint(2, 5))
-		url = self.get_page_url(url, page_no)
+		url = self.__get_page_url(url, page_no)
 		products = []
 
 		try:
