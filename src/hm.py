@@ -100,7 +100,7 @@ class HMScraper(Scraper):
 			'length': 'dt:has-text("Length:") + dd',
 			'style': 'dt:has-text("Style:") + dd',
 			'sizes': '#size-selector ul li label',
-			'available_colours': '.column2 .inner .product-colors .mini-slider ul li ul li a[aria-checked="true"]',
+			'selected_colour': '.column2 .inner .product-colors .mini-slider ul li ul li a[aria-checked="true"]',
 			'pattern': 'dt:has-text("Description:") + dd',
 			'categories': 'nav ol li a',
 			'cards': 'meta[property="og:image"]',
@@ -126,7 +126,6 @@ class HMScraper(Scraper):
 		sizes = [sizes.text_content().lower().replace('few pieces left', '').strip() for sizes in
 				 window.locator(selectors["sizes"]).all()]
 
-		raw_colours = window.locator(selectors["available_colours"]).get_attribute("title").lower()
 		image_urls = [image.get_attribute("src") for image in window.locator(selectors["images"]).all()]
 		image_urls += [image.get_attribute("content") for image in window.locator(selectors["cards"]).all()]
 
@@ -139,8 +138,6 @@ class HMScraper(Scraper):
 		if window.locator(selectors["fit"]).count() > 0:
 			fit = window.locator(selectors["fit"]).text_content().strip().lower()
 
-		length = [info.text_content().strip().lower() for info in window.locator(selectors["length"]).all()]
-
 		style = ""
 		if window.locator(selectors["style"]).count() > 0:
 			fit = window.locator(selectors["style"]).text_content().strip().lower()
@@ -150,21 +147,26 @@ class HMScraper(Scraper):
 
 		raw_categories = [category.text_content().strip().lower() for category in
 						  window.locator(selectors["categories"]).all()]
-		raw_categories += length
+		raw_categories += [info.text_content().strip().lower() for info in window.locator(selectors["length"]).all()]
+		raw_categories.append(window.locator(selectors["selected_colour"]).get_attribute("title").lower())
 		raw_categories.append(fit)
 		raw_categories.append(style)
 		raw_categories.append(title)
 		mapper_response = TagMapper.resolve_tags(raw_categories)
 
-		categories = mapper_response.Categories.Tags
+		categories = mapper_response.categories.tags
 		if len(categories) == 0:
 			logging.warning("Product {url} did not map to any categories.", categories=raw_categories, url=url)
 			return None
 
-		colour = mapper_response.Colours.Tags
-		if len(colour) == 0:
+		colour = mapper_response.colours.tags
+		if colour is None or len(colour) == 0:
 			logging.warning("Product {url} did not map to any colours.", categories=raw_categories, url=url)
 			return None
+
+		tags = []
+		if mapper_response.tags is not None and mapper_response.tags.tags is not None:
+			tags = mapper_response.tags.tags
 
 		composition_detail = []
 		for layer in window.locator(selectors["composition"]).all():
@@ -219,6 +221,7 @@ class HMScraper(Scraper):
 			sizes,
 			fit,
 			colour,
+			tags,
 			origin,
 			creation_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
 		)

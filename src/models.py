@@ -25,6 +25,7 @@ class InventoryItem:
 	sizes: list[str]
 	fit: str
 	colour: list[str]
+	tags: list[str]
 	origin: str
 	creation_time: str
 
