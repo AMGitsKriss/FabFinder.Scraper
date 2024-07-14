@@ -90,21 +90,24 @@ class HMScraper(Scraper):
 			results[p] = "hm"
 		return results
 
-	def get_product_details(self, window: Page, url: str):
+	def get_product_details(self, window: Page, url: str) -> list[InventoryItem]:
 		selectors = dict({
-			'title': 'section.product-name-price h1',
-			'brand': 'section.product-name-price h2 a',
-			'price': 'section.product-name-price .price hm-product-price div :first-child',
+			'title': 'h1',
+			'brand': '#__next > div.b0981f.d0fdd1 > div.rOGz > div > div > div.c58e1c.fe1f77.d12085.c9ee6e > div > div > div.ff0cbd.aef620 > div > h2 > a',
+			'price': '#__next > div.b0981f.d0fdd1 > div.rOGz > div > div > div.c58e1c.fe1f77.d12085.c9ee6e > div > div > div.e26896 > span',
+			'sizes': '[data-testid="size-selector"] label', ## id^=sizeButton-*
+			'images': 'ul[data-testid="grid-gallery"] img',
+			'materials_accordion': '#toggle-materialsAndSuppliersAccordion',
+			'origin_button': '#section-materialsAndSuppliersAccordion > div > div > button',
+			'origin_text': '#section-materialsAndSuppliersAccordion > div > div > div.db9e00 > div > div.ca411a > div:nth-child(4) > h3',
 			'composition': '#section-materialsAndSuppliersAccordion div div div:first-of-type ul li',
 			'fit': 'dt:has-text("Fit:") + dd',
 			'length': 'dt:has-text("Length:") + dd',
 			'style': 'dt:has-text("Style:") + dd',
-			'sizes': '#size-selector ul li label',
-			'selected_colour': '.column2 .inner .product-colors .mini-slider ul li ul li a[aria-checked="true"]',
+			'selected_colour': '#__next > div > div.rOGz > div > div > div > div > div > div > div > div > div > a[aria-checked="true"]',
 			'pattern': 'dt:has-text("Description:") + dd',
 			'categories': 'nav ol li a',
-			'cards': 'meta[property="og:image"]',
-			'images': '.column1 .sticky-candidate figure img'
+			'cards': 'meta[property="og:image"]'
 		})
 
 		try:
@@ -121,18 +124,30 @@ class HMScraper(Scraper):
 
 		title = window.locator(selectors["title"]).text_content().strip()
 		store = brand = "H&M"
-		price = float(window.locator(selectors["price"]).text_content().strip().replace("£", ""))
+		price = float(window.locator(selectors["price"]).all()[0].text_content().strip().replace("£", ""))
 
-		sizes = [sizes.text_content().lower().replace('few pieces left', '').strip() for sizes in
-				 window.locator(selectors["sizes"]).all()]
+		sizes = [sizes.text_content().lower()
+				 .replace('few pieces left', '')
+				 .replace('sold out', '')
+				 .strip()
+				 for sizes
+				 in window.locator(selectors["sizes"]).all()]
 
-		image_urls = [image.get_attribute("src") for image in window.locator(selectors["images"]).all()]
-		image_urls += [image.get_attribute("content") for image in window.locator(selectors["cards"]).all()]
+		image_urls = [image.get_attribute("content") for image in window.locator(selectors["cards"]).all()]
 
-		origin = window.evaluate(
-			f"() => productArticleDetails['{store_id}'].productAttributes.values.productCountryOfProduction")
-		if origin is None:
-			origin = "unknown"
+		origin = "unknown"
+		window.evaluate("() => window.scrollBy(0, 2000)")
+		window.wait_for_selector(selectors['materials_accordion'])
+		window.locator(selectors['materials_accordion']).click()
+		try:
+			window.wait_for_selector(selectors['origin_button'], timeout=5000)
+			if window.locator(selectors['origin_button']).count() > 0:
+				window.locator(selectors['origin_button']).click()
+				window.wait_for_selector(selectors['origin_text'])
+				if window.locator(selectors["origin_text"]).count() > 0:
+					origin = window.locator(selectors['origin_text']).text_content()
+		except:
+			pass
 
 		fit = "regular fit"
 		if window.locator(selectors["fit"]).count() > 0:
@@ -140,7 +155,7 @@ class HMScraper(Scraper):
 
 		style = ""
 		if window.locator(selectors["style"]).count() > 0:
-			fit = window.locator(selectors["style"]).text_content().strip().lower()
+			style = window.locator(selectors["style"]).text_content().strip().lower()
 
 		if window.locator(selectors["brand"]).count() > 0:
 			brand = window.locator(selectors["brand"]).text_content().strip()
@@ -194,9 +209,9 @@ class HMScraper(Scraper):
 			pattern = "floral"
 
 		audiences = []
-		if any("men" in cat for cat in raw_categories) or "men" in title.lower():
+		if any("men" == cat for cat in raw_categories):
 			audiences.append("men")
-		if any("women" in cat for cat in raw_categories) or "women" in title.lower():
+		if any("women" == cat for cat in raw_categories):
 			audiences.append("women")
 		if any("boys" in cat for cat in raw_categories) or "boys" in title.lower():
 			audiences.append("boys")
@@ -205,7 +220,7 @@ class HMScraper(Scraper):
 		if any("unisex" in cat for cat in raw_categories) or "unisex" in title.lower():
 			audiences.append("unisex")
 
-		product = InventoryItem(
+		products = [InventoryItem(
 			id,
 			store_id,
 			url,
@@ -224,9 +239,10 @@ class HMScraper(Scraper):
 			tags,
 			origin,
 			creation_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-		)
+		)]
 
-		self.file_manager.write_products(
-			os.path.join(self.directory, f"products/{product.store_id}.json"), product.to_dict())
+		for p in products:
+			self.file_manager.write_products(
+				os.path.join(self.directory, f"products/{p.store_id}.json"), p.to_dict())
 
-		return product
+		return products

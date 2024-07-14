@@ -13,8 +13,8 @@ def run():
 		"hm": HMScraper(file_manager)
 	}
 
-	#LoopReader().run(scrapers)
-	RabbitReader().run(scrapers)
+	LoopReader().run(scrapers)
+	#RabbitReader().run(scrapers)
 
 
 def setup():

@@ -7,6 +7,7 @@ from playwright.sync_api import Page
 import re
 
 from scraper import Scraper
+from tag_mapper import TagMapper
 
 
 class MSScraper(Scraper):
@@ -70,84 +71,68 @@ class MSScraper(Scraper):
 
 		return products
 
-	def get_product_details(self, window: Page, url: str):
+	def get_product_details(self, window: Page, url: str) -> list[InventoryItem]:
 		selectors = dict({
 			'product_code' : 'main div div div p:has-text("Product code")',
 			'title': 'main div h1',
-			'brand': 'main div div div p[style="text-transform:uppercase"]',
+			'brand': 'main > div[class*=page-container] > div[class*=eco-box] > div#product-info a[class*=brand-title]',
 			'price': 'main div div div p:has-text("£")',
-			'fits_sizes' : '.ejht3ye2 li inport[name="size-select"]',
-			'composition': '#section-materialsAndSuppliersAccordion div div div:first-of-type ul li',
-			'fit': 'dt:has-text("Fit:") + dd',
-			'available_colours' : '.column2 .inner .product-colors .mini-slider ul li ul li a',
-			'pattern': 'dt:has-text("Description:") + dd',
-			'categories' : 'nav ol li a',
-			'images' : '.column1 .sticky-candidate figure img'
+			'fits_sizes' : 'div[class*=size-selector] > ul > li > label >  input[name="size-select"]',
+			'description': 'div[class*="page-container"] > div[class*="eco-box"] > div[class*="eco-box"] > div[class*="css"] > p[class*="media-0_body"]',
+			'selected_colour' : 'div#product-info > div[class*="eco-box"] > p[class*="eco-box"] > span#selected-colour-option-text',
+			'cards': 'meta[property="og:image"]',
+			'images' : 'div[data-tagg=image-container] img',
+			'composition': 'div[class*=accordion] > details > div[class*=accordion] > div[class*=css] > div[class*=css] > p[class*=media-0_body]:has-text("%")',
+			'categories' : 'nav > ul[class*=breadcrumb] > li[class*=breadcrumb] > a[class*=media]'
 		})
 
-		# Container: .ejht3ye2
-		# Fit: .ejht3ye2 h2
-		# Sizes .ejht3ye2 h2 + ul
-
 		window.goto(url)
-		window.wait_for_selector(selectors["title"]) 
+		window.wait_for_selector(selectors["title"])
 
 		store_id = window.locator(selectors["product_code"]).text_content().split(":")[-1].strip()
-
-		id = f"ms-{store_id}"
 		title = window.locator(selectors["title"]).text_content().strip()
 		store = brand = "M&S"
-		price = float(window.locator(selectors["price"]).text_content().strip().replace("£", ""))
+		price = float(window.locator(selectors["price"]).all()[0].text_content().strip().replace("£", ""))
 
 		fit_sizes = window.locator(selectors["fits_sizes"])
 		size_dict = dict()
-		for size in li.all():
-			val = size.get_attribute('value').split(' ')
-			fit = val[1].lower() if len(val) > 1 else "regular"
+		for size_label in fit_sizes.all():
+			# "M Regular", "L Tall", etc.
+			val = size_label.get_attribute('value').split(' ')
+			fit = val[1].lower() if len(val) > 1 else "regular" # TODO - Get the default fit from the page!
+			size = val[0]
 			if fit not in size_dict:
 				size_dict[fit] = []
-			size_dict[fit].append(size[0])
+			size_dict[fit].append(size)
 
+		description = window.locator(selectors["description"]).text_content()
+		categories = [category.text_content().strip().lower() for category in
+						  window.locator(selectors["categories"]).all()[1:]]
 
+		raw_info = []
+		raw_info += categories
+		raw_info.append(window.locator(selectors["selected_colour"]).text_content().lower())
+		raw_info.append(title)
+		raw_info.append(description)
+		mapper_response = TagMapper.resolve_tags(raw_info)
 
-		available_colours = [colour.get_attribute("title").lower() for colour in window.locator(selectors["available_colours"]).all()]
-		categories = [category.text_content().strip().lower() for category in window.locator(selectors["categories"]).all()]
-		image_urls = [image.get_attribute("src") for image in window.locator(selectors["images"]).all()]
-		origin = window.evaluate(f"() => productArticleDetails['{store_id}'].productAttributes.values.productCountryOfProduction")
-		if origin is None:
-			origin = "unknown"
+		image_urls = [image.get_attribute("content") for image in window.locator(selectors["cards"]).all()]
+		image_urls += [image.get_attribute("src") for image in window.locator(selectors["images"]).all()]
 
-		fit = None
-		if window.locator(selectors["fit"]).count() > 0: 
-			fit = window.locator(selectors["fit"]).text_content().strip().lower()
+		origin = "unknown"
 
-		if window.locator(selectors["brand"]).count() > 0 and True:
+		if window.locator(selectors["brand"]).count() > 0:
 			brand = window.locator(selectors["brand"]).text_content().strip()
 
 		composition_detail = []
-		for layer in window.locator(selectors["composition"]).all():
-			comp_title = None
+		raw_composition = window.locator(selectors["composition"]).text_content()
+		for layer in raw_composition.split(' - '):
 			info = dict()
-			if layer.locator('h4').count() > 0:
-				comp_title = layer.locator('h4').text_content().strip().lower().replace(":", "")
-			for material in layer.locator('p').text_content().strip().split(','):
-				name = re.sub('[0-9%]', '', material).lower()
-				percentage = float(re.sub('[a-zA-Z%]', '', material))/100
+			for material in re.split(',|and', layer):
+				name = re.sub('[0-9%]', '', material).lower().strip()
+				percentage = float(re.sub('[^0-9.]', '', material))/100
 				info[name] = percentage
-			composition_detail.append(CompositionDetail(comp_title, info))
-
-		description_detail = window.locator(selectors["pattern"])
-		pattern = "solid"
-		if description_detail.count() > 0:
-			description = description_detail.text_content().strip().lower()
-			if "floral" in description.lower():
-				pattern = "floral"
-			elif "striped" in description.lower():
-				pattern = "striped"
-		elif "printed" in title.lower():
-			pattern = "printed"
-		elif "floral" in title.lower():
-			pattern = "floral"
+			composition_detail.append(CompositionDetail(None, info))
 
 		audiences = []
 		if "men" in categories or "men" in title.lower():
@@ -161,22 +146,31 @@ class MSScraper(Scraper):
 		if "unisex" in categories or "unisex" in title.lower():
 			audiences.append("unisex")
 
-		return InventoryItem(
-			id,
-			store_id,
-			url,
-			title, 
-			store,
-			brand,
-			price,
-			composition_detail,
-			pattern,
-			categories,
-			image_urls,
-			audiences,
-			sizes,
-			fit,
-			available_colours,
-			origin,
-			creation_time = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-		)
+		products = []
+		for fit, sizes in size_dict.items():
+			products.append(InventoryItem(
+				f"ms-{store_id}-{fit}",
+				store_id,
+				url,
+				title,
+				store,
+				brand,
+				price,
+				composition_detail,
+				mapper_response.pattern,
+				mapper_response.categories.tags,
+				image_urls,
+				audiences,
+				sizes,
+				fit,
+				mapper_response.colours.tags,
+				mapper_response.tags.tags,
+				origin,
+				creation_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+			))
+
+		for p in products:
+			self.file_manager.write_products(
+				os.path.join(self.directory, f"products/{p.id}.json"), p.to_dict())
+
+		return products
