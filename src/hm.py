@@ -94,7 +94,7 @@ class HMScraper(Scraper):
 		selectors = dict({
 			'title': 'h1',
 			'brand': '#__next > div.b0981f.d0fdd1 > div.rOGz > div > div > div.c58e1c.fe1f77.d12085.c9ee6e > div > div > div.ff0cbd.aef620 > div > h2 > a',
-			'price': '#__next > div.b0981f.d0fdd1 > div.rOGz > div > div > div.c58e1c.fe1f77.d12085.c9ee6e > div > div > div.e26896 > span',
+			'price': '#__next > div.b0981f.d0fdd1 > div.rOGz > div > div > div.c58e1c.fe1f77.d12085.c9ee6e > div > div > div.e26896 > .edbe20.ac3d9e.d9ca8b.e29fbf:has-text("£")',
 			'sizes': '[data-testid="size-selector"] label', ## id^=sizeButton-*
 			'images': 'ul[data-testid="grid-gallery"] img',
 			'materials_accordion': '#toggle-materialsAndSuppliersAccordion',
@@ -155,7 +155,7 @@ class HMScraper(Scraper):
 
 		style = ""
 		if window.locator(selectors["style"]).count() > 0:
-			style = window.locator(selectors["style"]).text_content().strip().lower()
+			style = window.locator(selectors["style"]).all()[0].text_content().strip().lower()
 
 		if window.locator(selectors["brand"]).count() > 0:
 			brand = window.locator(selectors["brand"]).text_content().strip()

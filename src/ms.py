@@ -3,7 +3,7 @@ from datetime import datetime
 
 from file_manager import FileManager
 from models import *
-from playwright.sync_api import Page
+from playwright.sync_api import Page, Locator
 import re
 
 from scraper import Scraper
@@ -19,6 +19,7 @@ class MSScraper(Scraper):
 		'https://www.marksandspencer.com/l/men/mens-jeans',
 		'https://www.marksandspencer.com/l/men/mens-tops'
 	]
+	new_session = True
 
 	def __init__(self, file_manager: FileManager):
 		self.file_manager = file_manager
@@ -73,21 +74,26 @@ class MSScraper(Scraper):
 
 	def get_product_details(self, window: Page, url: str) -> list[InventoryItem]:
 		selectors = dict({
-			'product_code' : 'main div div div p:has-text("Product code")',
+			'cookies': '#onetrust-reject-all-handler',
+			'product_code': 'main div div div p:has-text("Product code")',
 			'title': 'main div h1',
 			'brand': 'main > div[class*=page-container] > div[class*=eco-box] > div#product-info a[class*=brand-title]',
 			'price': 'main div div div p:has-text("£")',
-			'fits_sizes' : 'div[class*=size-selector] > ul > li > label >  input[name="size-select"]',
-			'description': 'div[class*="page-container"] > div[class*="eco-box"] > div[class*="eco-box"] > div[class*="css"] > p[class*="media-0_body"]',
-			'selected_colour' : 'div#product-info > div[class*="eco-box"] > p[class*="eco-box"] > span#selected-colour-option-text',
+			'fits_sizes': 'div[class*=size-selector] > ul > li > label >  input[name="size-select"]',
+			'description': '#product-info > div:nth-child(23) > p"]',
+			'selected_colour': 'div#product-info > div[class*="eco-box"] > p[class*="eco-box"] > span#selected-colour-option-text',
 			'cards': 'meta[property="og:image"]',
-			'images' : 'div[data-tagg=image-container] img',
-			'composition': 'div[class*=accordion] > details > div[class*=accordion] > div[class*=css] > div[class*=css] > p[class*=media-0_body]:has-text("%")',
-			'categories' : 'nav > ul[class*=breadcrumb] > li[class*=breadcrumb] > a[class*=media]'
+			'images': 'div[data-tagg=image-container] img',
+			'composition': 'details > div > div > div> p:has-text("%")',
+			'categories': 'nav > ul[class*=breadcrumb] > li[class*=breadcrumb] > a[class*=media]'
 		})
 
 		window.goto(url)
 		window.wait_for_selector(selectors["title"])
+
+		if self.new_session:
+			window.wait_for_selector(selectors["cookies"])
+			window.locator(selectors["cookies"]).click()
 
 		store_id = window.locator(selectors["product_code"]).text_content().split(":")[-1].strip()
 		title = window.locator(selectors["title"]).text_content().strip()
@@ -99,18 +105,21 @@ class MSScraper(Scraper):
 		for size_label in fit_sizes.all():
 			# "M Regular", "L Tall", etc.
 			val = size_label.get_attribute('value').split(' ')
-			fit = val[1].lower() if len(val) > 1 else "regular" # TODO - Get the default fit from the page!
+			fit = val[1].lower() if len(val) > 1 else "regular"  # TODO - Get the default fit from the page!
 			size = val[0]
 			if fit not in size_dict:
 				size_dict[fit] = []
 			size_dict[fit].append(size)
 
-		description = window.locator(selectors["description"]).text_content()
-		categories = [category.text_content().strip().lower() for category in
-						  window.locator(selectors["categories"]).all()[1:]]
+		description = ""
+		for text in window.locator('#product-info > div > p').all():
+			description += text.text_content()
+			description += " "
+		raw_categories = [category.text_content().strip().lower() for category in
+					  window.locator(selectors["categories"]).all()[1:]]
 
 		raw_info = []
-		raw_info += categories
+		raw_info += raw_categories
 		raw_info.append(window.locator(selectors["selected_colour"]).text_content().lower())
 		raw_info.append(title)
 		raw_info.append(description)
@@ -124,26 +133,25 @@ class MSScraper(Scraper):
 		if window.locator(selectors["brand"]).count() > 0:
 			brand = window.locator(selectors["brand"]).text_content().strip()
 
-		composition_detail = []
-		raw_composition = window.locator(selectors["composition"]).text_content()
-		for layer in raw_composition.split(' - '):
-			info = dict()
-			for material in re.split(',|and', layer):
-				name = re.sub('[0-9%]', '', material).lower().strip()
-				percentage = float(re.sub('[^0-9.]', '', material))/100
-				info[name] = percentage
-			composition_detail.append(CompositionDetail(None, info))
+		# 98% cotton, 2% elastane (exclusive of trimmings) , Jacket lining - 100% cotton , Sleeve lining - 100% polyester
+		# 52% viscose lenzing™ ecovero™, 28% polyester and 20% nylon
+
+		raw_composition = ""
+		for element in window.locator(selectors["composition"]).all():
+			raw_composition += element.text_content()
+			raw_composition += " "
+		composition_detail = self.parse_composition(raw_composition)
 
 		audiences = []
-		if "men" in categories or "men" in title.lower():
+		if any("men" == cat for cat in raw_categories):
 			audiences.append("men")
-		if "women" in categories or "women" in title.lower():
+		if any("women" == cat for cat in raw_categories):
 			audiences.append("women")
-		if "boys" in categories or "boys" in title.lower():
+		if any("boys" in cat for cat in raw_categories) or "boys" in title.lower():
 			audiences.append("boys")
-		if "girls" in categories or "girls" in title.lower():
+		if any("girls" in cat for cat in raw_categories) or "girls" in title.lower():
 			audiences.append("girls")
-		if "unisex" in categories or "unisex" in title.lower():
+		if any("unisex" in cat for cat in raw_categories) or "unisex" in title.lower():
 			audiences.append("unisex")
 
 		products = []
@@ -174,3 +182,24 @@ class MSScraper(Scraper):
 				os.path.join(self.directory, f"products/{p.id}.json"), p.to_dict())
 
 		return products
+
+	def parse_composition(self, raw_composition: str) -> list[CompositionDetail]:
+		# 98% cotton, 2% elastane (exclusive of trimmings) , Jacket lining - 100% cotton , Sleeve lining - 100% polyester
+		# 52% viscose lenzing™ ecovero™, 28% polyester and 20% nylon
+
+		composition_detail = []
+
+		for layer in raw_composition.split(' , '): # comma with extra spacing seems to indicate a layer seperator
+			info = dict()
+
+			title = None
+			if ' - ' in layer:
+				title = layer.split(' - ')[0].strip()
+
+			for material in re.split(',|and', layer):
+				name = re.sub('[0-9%]', '', material).lower().strip()
+				percentage = float(re.sub('[^0-9.]', '', material)) / 100
+				info[name] = percentage
+			composition_detail.append(CompositionDetail(None, info))
+
+		return composition_detail
