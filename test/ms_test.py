@@ -20,7 +20,7 @@ class MyTestCase(unittest.TestCase):
 			browser = pw.chromium.launch(headless=False)
 			context = browser.new_context(viewport={"width": 1280, "height": 720})
 			window = context.new_page()
-			product_list = self.scraper._MSScraper__refresh_page_products(window, "https://www.marksandspencer.com/l/men/mens-hoodies-and-sweatshirts#intid=gnav_Men_Clothing_Hoodies-and-Sweatshirts?page=1")
+			product_list = self.scraper._MSScraper__refresh_page_products(window, "https://www.marksandspencer.com/l/men/mens-hoodies-and-sweatshirts?page=1", 1)
 		pass
 
 	def test_jeans(self):

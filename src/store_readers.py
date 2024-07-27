@@ -17,7 +17,7 @@ class LoopReader:
 			browser = pw.chromium.launch(headless=False)
 			window = browser.new_page()
 
-			refresh_products = True
+			refresh_products = False
 			if refresh_products:
 				for store, scraper in scrapers.items():
 					scraper.get_catalogue(window)

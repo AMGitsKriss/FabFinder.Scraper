@@ -61,7 +61,7 @@ class HMScraper(Scraper):
 		product_selector = "#products-listing-section ul li .splide ul li:first-of-type a"
 		page_no_selector = '#products-listing-section nav[role="navigation"] ul li a[aria-current="true"]'
 
-		# time.sleep(random.randint(2, 5))
+		time.sleep(random.randint(2, 5))
 		url = self.__get_page_url(url, page_no)
 		products = []
 

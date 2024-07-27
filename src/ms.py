@@ -1,11 +1,13 @@
+import logging
 import os
+import random
+import time
 from datetime import datetime
 
 from file_manager import FileManager
 from models import *
-from playwright.sync_api import Page, Locator
+from playwright.sync_api import Page
 import re
-
 from scraper import Scraper
 from tag_mapper import TagMapper
 
@@ -108,7 +110,7 @@ class MSScraper(Scraper):
 		while True:
 			paginated_url = self.__get_page_url(url, page_no)
 
-			results = list(self.__refresh_page_products(window, paginated_url))
+			results = list(self.__refresh_page_products(window, paginated_url, page_no))
 			product_urls += results
 			page_no += 1
 
@@ -117,15 +119,20 @@ class MSScraper(Scraper):
 
 		return product_urls
 
-	def __refresh_page_products(self, window: Page, url: str):
+	def __refresh_page_products(self, window: Page, url: str, page_no: int):
 		product_grid = "div.grid_container__flAnn"
 		product_selector = "div.grid_container__flAnn a[class*=product-card]"
-		# #\36 0502727 > div > a
-		# #\36 0555869 > div > a
-		# div.grid_container__flAnn div > div > a
 
 		window.goto(url)  # go to url
-		window.wait_for_selector(product_grid)  # wait for content to load
+
+		time.sleep(random.randint(1, 3))
+		url = self.__get_page_url(url, page_no)
+
+		try:
+			window.wait_for_selector(product_grid)  # wait for content to load
+		except:
+			logging.exception("Failed to find grid on {url}", url)
+			return []
 
 		self.__check_session(window)
 
@@ -145,6 +152,13 @@ class MSScraper(Scraper):
 			window.wait_for_selector(cookies)
 			window.locator(cookies).click()
 			self.new_session = False
+
+	def load_products(self):
+		results = {}
+		products = self.file_manager.read_products(os.path.join(self.directory, "all_products.json"))
+		for p in products:
+			results[p] = "ms"
+		return results
 
 	def get_product_details(self, window: Page, url: str) -> list[InventoryItem]:
 		selectors = dict({
