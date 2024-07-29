@@ -171,7 +171,8 @@ class MSScraper(Scraper):
 			'selected_colour': 'div#product-info > div[class*="eco-box"] > p[class*="eco-box"] > span#selected-colour-option-text',
 			'cards': 'meta[property="og:image"]',
 			'images': 'div[data-tagg=image-container] img',
-			'composition': 'details > div > div > div> p:has-text("%")',
+			# 'composition': 'details > div > div > div> p:has-text("%")',
+			'composition': 'details > div > div > div[class*=product-details_compositionContainer] > p:nth-child(2)',
 			'categories': 'nav > ul[class*=breadcrumb] > li[class*=breadcrumb] > a[class*=media]'
 		})
 
@@ -183,14 +184,15 @@ class MSScraper(Scraper):
 		store_id = window.locator(selectors["product_code"]).text_content().split(":")[-1].strip()
 		title = window.locator(selectors["title"]).text_content().strip()
 		store = brand = "M&S"
-		price = float(window.locator(selectors["price"]).all()[0].text_content().strip().replace("£", ""))
+		price = self.__parse_price(window.locator(selectors["price"]).all()[0].text_content())
 
 		fit_sizes = window.locator(selectors["fits_sizes"])
 		size_dict = dict()
 		for size_label in fit_sizes.all():
 			# "M Regular", "L Tall", etc.
 			val = size_label.get_attribute('value').split(' ')
-			fit = val[1].lower() if len(val) > 1 else "regular"  # TODO - Get the default fit from the page!
+			fit = val[1].lower().replace('/', '-') if len(
+				val) > 1 else "regular"  # TODO - Get the default fit from the page!
 			size = val[0]
 			if fit not in size_dict:
 				size_dict[fit] = []
@@ -225,7 +227,7 @@ class MSScraper(Scraper):
 		for element in window.locator(selectors["composition"]).all():
 			raw_composition += element.text_content()
 			raw_composition += " "
-		composition_detail = self.parse_composition(raw_composition)
+		composition_detail = self.__parse_composition(raw_composition)
 
 		audiences = []
 		if any("men" == cat for cat in raw_categories):
@@ -268,7 +270,11 @@ class MSScraper(Scraper):
 
 		return products
 
-	def parse_composition(self, raw_composition: str) -> list[CompositionDetail]:
+	def __parse_price(self, raw_price_str: str):
+		min_max = raw_price_str.strip().split('-')
+		return float(min_max[0].replace("£", ""))
+
+	def __parse_composition(self, raw_composition: str) -> list[CompositionDetail]:
 		# 98% cotton, 2% elastane (exclusive of trimmings) , Jacket lining - 100% cotton , Sleeve lining - 100% polyester
 		# 52% viscose lenzing™ ecovero™, 28% polyester and 20% nylon
 
@@ -279,12 +285,59 @@ class MSScraper(Scraper):
 
 			title = None
 			if ' - ' in layer:
-				title = layer.split(' - ')[0].strip()
+				split_layer = layer.split(' - ')
+				if '%' not in split_layer[0]:
+					title = split_layer[0].strip()
+					layer = split_layer[1]
 
-			for material in re.split(',|and', layer):
-				name = re.sub('[0-9%]', '', material).lower().strip()
-				percentage = float(re.sub('[^0-9.]', '', material)) / 100
-				info[name] = percentage
-			composition_detail.append(CompositionDetail(None, info))
+			materials = re.split(',| and ', layer)
+			for material in materials:
+				material_name = re.sub('[0-9%]', '', material).lower().strip()
+				percentage = re.sub('[^0-9.]', '', material)
+				if percentage == '':
+					percentage = 100
+				info[material_name] = float(percentage) / 100
+
+			# Don't add empty layers
+			if len(info) > 0:
+				composition_detail.append(CompositionDetail(title, info))
 
 		return composition_detail
+
+	def __parse_composition_new(self, composition: str, has_numbers: bool = True, results : list[CompositionDetail] = None) -> list[CompositionDetail]:
+		if results is None:
+			results = []
+
+		mapped = None
+		if len(results) > 0:
+			mapped = results[-1]
+
+		if(mapped is None):
+			mapped = CompositionDetail(None, None)
+			results.append(mapped)
+
+		split_comp = re.split(r'-|,| and |:', composition)
+
+		left = split_comp[0].strip()
+		right = re.sub(r'^-|^,|^and|^:', '', composition[len(left)+1:]).strip()
+
+		if has_numbers and not bool(re.search(r'\d', left)):
+			mapped.title = left
+		else:
+			if mapped.composition is None:
+				mapped.composition = dict()
+			material_name = re.sub('[0-9%]', '', left).lower().strip()
+			percentage = re.sub('[^0-9.]', '', left)
+			if percentage == '':
+				percentage = 100
+			mapped.composition[material_name] = float(percentage) / 100
+
+		if mapped.composition is not None and sum(mapped.composition.values()) == 1:
+			results.append(CompositionDetail(None, None))
+		elif mapped.composition is not None and sum(mapped.composition.values()) > 1:
+			raise Exception("Some maths went wrong when calculating the composition")
+
+		if right != "":
+			return self.__parse_composition_new(right, has_numbers, results)
+		else:
+			return results[:-1]

@@ -35,9 +35,10 @@ class TagMapper:
 				return TagCollection(**response.json())
 			else:
 				logging.error(
-					msg="Mapper Service responded with {responseCode}. {url}",
-					responseCode=response.status_code,
-					url=url)
+					msg="Mapper Service responded with {ResponseCode}. {Endpoint}",
+					ResponseCode=response.status_code,
+					Endpoint=url,
+					Payload=store_text)
 		except Exception as ex:
-			logging.exception("Failed to read tags from the Mapper Service {url}", url=url)
+			logging.exception("Failed to read tags from the Mapper Service {url}", url)
 		return TagCollection()

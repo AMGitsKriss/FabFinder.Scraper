@@ -6,7 +6,7 @@ from src.hm import *
 from setup import LogInstaller
 
 
-# python -m unittest hm_test.MyTestCase.test_tshirt
+# python -m test hm_test.MyTestCase.test_tshirt
 
 class MyTestCase(unittest.TestCase):
 	def setUp(self):
