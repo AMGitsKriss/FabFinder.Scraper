@@ -36,7 +36,7 @@ class LoopReader:
 					self.write_pending(remaining_product_urls)
 
 	def read_pending(self):
-		file = "../../DATA/stores/pending_products.json"
+		file = "../../../DATA/stores/pending_products.json"
 		result = {}
 		try:
 			if os.path.isfile(file):
@@ -48,7 +48,7 @@ class LoopReader:
 		return result
 
 	def write_pending(self, obj):
-		file = "../../DATA/stores/pending_products.json"
+		file = "../../../DATA/stores/pending_products.json"
 		try:
 			with open(file, 'w', encoding="utf-8") as f:
 				json.dump(obj, f, ensure_ascii=False, indent=4)

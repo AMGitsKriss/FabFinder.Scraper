@@ -4,7 +4,7 @@ import urllib3  # Supress SSL errors for debugging
 from scrapers.george import GeorgeScraper
 from scrapers.ms import *
 from setup import LogInstaller
-from store_readers import LoopReader
+from queue.store_readers import LoopReader
 
 
 def run():

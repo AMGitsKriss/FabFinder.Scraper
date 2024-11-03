@@ -181,7 +181,7 @@ class MSScraper(Scraper):
 
 		self.__check_session(window)
 
-		store_id = window.locator(selectors["product_code"]).text_content().split(":")[-1].strip()
+		store_product_id = window.locator(selectors["product_code"]).text_content().split(":")[-1].strip()
 		title = window.locator(selectors["title"]).text_content().strip()
 		store = brand = "M&S"
 		price = self.__parse_price(window.locator(selectors["price"]).all()[0].text_content())
@@ -205,7 +205,7 @@ class MSScraper(Scraper):
 		raw_categories = [category.text_content().strip().lower() for category in
 						  window.locator(selectors["categories"]).all()[1:]]
 
-		raw_info = [store_id]
+		raw_info = [store_product_id]
 		raw_info += raw_categories
 		raw_info.append(window.locator(selectors["selected_colour"]).text_content().lower())
 		raw_info.append(title)
@@ -244,8 +244,9 @@ class MSScraper(Scraper):
 		products = []
 		for fit, sizes in size_dict.items():
 			products.append(InventoryItem(
-				f"ms-{store_id}-{fit}",
-				store_id,
+				f"ms-{store_product_id}-{fit}",
+				"ms",
+				store_product_id,
 				url,
 				title,
 				store,

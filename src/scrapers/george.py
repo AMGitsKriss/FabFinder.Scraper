@@ -263,6 +263,7 @@ class GeorgeScraper(Scraper):
 		for fit, sizes in size_dict.items():
 			products.append(InventoryItem(
 				f"george-{item.product_id}-{fit}",
+				"george",
 				item.product_id,
 				item.url,
 				item.name,

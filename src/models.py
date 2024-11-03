@@ -12,6 +12,7 @@ class CompositionDetail:
 class InventoryItem:
 	id: str
 	store_id: int
+	store_product_id: int
 	url: str
 	title: str
 	store: str

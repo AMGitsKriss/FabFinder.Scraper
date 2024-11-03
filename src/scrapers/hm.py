@@ -119,8 +119,8 @@ class HMScraper(Scraper):
 
 		window.wait_for_selector(selectors["title"])
 
-		store_id = url.split(".")[-2]
-		id = f"hm-{store_id}"
+		store_product_id = url.split(".")[-2]
+		id = f"hm-{store_product_id}"
 
 		title = window.locator(selectors["title"]).text_content().strip()
 		store = brand = "H&M"
@@ -160,7 +160,7 @@ class HMScraper(Scraper):
 		if window.locator(selectors["brand"]).count() > 0:
 			brand = window.locator(selectors["brand"]).text_content().strip()
 
-		raw_categories = [store_id]
+		raw_categories = [store_product_id]
 		raw_categories += [category.text_content().strip().lower() for category in
 						  window.locator(selectors["categories"]).all()]
 		raw_categories += [info.text_content().strip().lower() for info in window.locator(selectors["length"]).all()]
@@ -223,7 +223,8 @@ class HMScraper(Scraper):
 
 		products = [InventoryItem(
 			id,
-			store_id,
+			"hm",
+			store_product_id,
 			url,
 			title,
 			store,
