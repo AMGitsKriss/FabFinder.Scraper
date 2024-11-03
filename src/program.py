@@ -1,18 +1,18 @@
 import sys
 import urllib3  # Supress SSL errors for debugging
 
-from hm import *
-from ms import *
+from scrapers.george import GeorgeScraper
+from scrapers.ms import *
 from setup import LogInstaller
-from store_readers import LoopReader, RabbitReader
-
+from store_readers import LoopReader
 
 
 def run():
 	file_manager = FileManager()
 	scrapers = {
 		#"hm": HMScraper(file_manager),
-		"ms": MSScraper(file_manager)
+		#"ms": MSScraper(file_manager)
+		"george": GeorgeScraper(file_manager)
 	}
 
 	LoopReader().run(scrapers)

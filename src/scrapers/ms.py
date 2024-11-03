@@ -4,11 +4,11 @@ import random
 import time
 from datetime import datetime
 
-from file_manager import FileManager
+from data.file_manager import FileManager
 from models import *
 from playwright.sync_api import Page
 import re
-from scraper import Scraper
+from scrapers.scraper import Scraper
 from tag_mapper import TagMapper
 
 
@@ -205,7 +205,7 @@ class MSScraper(Scraper):
 		raw_categories = [category.text_content().strip().lower() for category in
 						  window.locator(selectors["categories"]).all()[1:]]
 
-		raw_info = []
+		raw_info = [store_id]
 		raw_info += raw_categories
 		raw_info.append(window.locator(selectors["selected_colour"]).text_content().lower())
 		raw_info.append(title)
@@ -227,7 +227,7 @@ class MSScraper(Scraper):
 		for element in window.locator(selectors["composition"]).all():
 			raw_composition += element.text_content()
 			raw_composition += " "
-		composition_detail = self.__parse_composition(raw_composition)
+		composition_detail = self.__parse_composition(raw_composition, bool(re.search(r'\d', raw_composition)))
 
 		audiences = []
 		if any("men" == cat for cat in raw_categories):
@@ -274,37 +274,7 @@ class MSScraper(Scraper):
 		min_max = raw_price_str.strip().split('-')
 		return float(min_max[0].replace("£", ""))
 
-	def __parse_composition(self, raw_composition: str) -> list[CompositionDetail]:
-		# 98% cotton, 2% elastane (exclusive of trimmings) , Jacket lining - 100% cotton , Sleeve lining - 100% polyester
-		# 52% viscose lenzing™ ecovero™, 28% polyester and 20% nylon
-
-		composition_detail = []
-
-		for layer in raw_composition.split(' , '):  # comma with extra spacing seems to indicate a layer seperator
-			info = dict()
-
-			title = None
-			if ' - ' in layer:
-				split_layer = layer.split(' - ')
-				if '%' not in split_layer[0]:
-					title = split_layer[0].strip()
-					layer = split_layer[1]
-
-			materials = re.split(',| and ', layer)
-			for material in materials:
-				material_name = re.sub('[0-9%]', '', material).lower().strip()
-				percentage = re.sub('[^0-9.]', '', material)
-				if percentage == '':
-					percentage = 100
-				info[material_name] = float(percentage) / 100
-
-			# Don't add empty layers
-			if len(info) > 0:
-				composition_detail.append(CompositionDetail(title, info))
-
-		return composition_detail
-
-	def __parse_composition_new(self, composition: str, has_numbers: bool = True, results : list[CompositionDetail] = None) -> list[CompositionDetail]:
+	def __parse_composition(self, composition: str, has_numbers: bool = True, results : list[CompositionDetail] = None) -> list[CompositionDetail]:
 		if results is None:
 			results = []
 
@@ -338,6 +308,6 @@ class MSScraper(Scraper):
 			raise Exception("Some maths went wrong when calculating the composition")
 
 		if right != "":
-			return self.__parse_composition_new(right, has_numbers, results)
+			return self.__parse_composition(right, has_numbers, results)
 		else:
 			return results[:-1]

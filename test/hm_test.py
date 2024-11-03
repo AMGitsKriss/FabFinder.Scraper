@@ -2,7 +2,7 @@ from playwright.sync_api import sync_playwright
 import urllib3
 import unittest
 
-from src.hm import *
+from scrapers.hm import *
 from setup import LogInstaller
 
 

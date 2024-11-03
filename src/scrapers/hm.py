@@ -1,9 +1,9 @@
 import os.path
 from datetime import datetime
 
-from file_manager import FileManager
+from data.file_manager import FileManager
 from models import *
-from scraper import Scraper
+from scrapers.scraper import Scraper
 from tag_mapper import *
 from playwright.sync_api import Page
 import re
@@ -160,7 +160,8 @@ class HMScraper(Scraper):
 		if window.locator(selectors["brand"]).count() > 0:
 			brand = window.locator(selectors["brand"]).text_content().strip()
 
-		raw_categories = [category.text_content().strip().lower() for category in
+		raw_categories = [store_id]
+		raw_categories += [category.text_content().strip().lower() for category in
 						  window.locator(selectors["categories"]).all()]
 		raw_categories += [info.text_content().strip().lower() for info in window.locator(selectors["length"]).all()]
 		raw_categories.append(window.locator(selectors["selected_colour"]).get_attribute("title").lower())

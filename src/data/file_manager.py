@@ -2,10 +2,12 @@ import json
 import logging
 import os
 
-
-class FileManager:
+class FileManager(DataManager):
 	def write_products(self, file: str, to_write):
 		try:
+			dir = os.path.dirname(file)
+			if not os.path.exists(dir):
+				os.makedirs(dir)
 			with open(file, 'w', encoding="utf-8") as f:
 				json.dump(to_write, f, ensure_ascii=False, indent=4)
 		except:
