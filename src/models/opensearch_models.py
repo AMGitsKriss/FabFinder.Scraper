@@ -36,16 +36,3 @@ class InventoryItem:
 class Category:
 	singular: str
 	plural: str
-
-
-@dataclass_json
-@dataclass
-class DetailRequestMsg:
-	store: str # HM / MS / ASOS
-	url: str
-
-
-@dataclass_json
-@dataclass
-class CatalogueRequestMsg:
-	store: str # HM / MS / ASOS
