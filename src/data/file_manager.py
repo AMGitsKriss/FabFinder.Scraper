@@ -2,8 +2,10 @@ import json
 import logging
 import os
 
-class FileManager(DataManager):
-	def write_products(self, file: str, to_write):
+from data.base_manager import BaseManager
+
+class FileManager(BaseManager):
+	def write_product_details(self, file: str, to_write):
 		try:
 			dir = os.path.dirname(file)
 			if not os.path.exists(dir):

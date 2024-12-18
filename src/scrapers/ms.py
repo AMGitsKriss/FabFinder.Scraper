@@ -5,11 +5,14 @@ import time
 from datetime import datetime
 
 from data.file_manager import FileManager
-from models import *
+from models.opensearch_models import *
 from playwright.sync_api import Page
 import re
+
+from data.basepublisher import BasePublisher
+from models.queue_models import DetailsRequestMsg
 from scrapers.scraper import Scraper
-from tag_mapper import TagMapper
+from tag_mapper_client import TagMapper
 
 
 class MSScraper(Scraper):
@@ -84,8 +87,9 @@ class MSScraper(Scraper):
 	}
 	new_session = True
 
-	def __init__(self, file_manager: FileManager):
-		self.file_manager = file_manager
+	def __init__(self, file_manager: FileManager, publisher: BasePublisher):
+		self.publisher = publisher
+		self.data_manager = file_manager
 
 	def get_catalogue(self, window: Page) -> list[str]:
 		product_urls = []
@@ -94,7 +98,7 @@ class MSScraper(Scraper):
 			product_urls += self.__refresh_category_products(window, url)
 			product_urls = list(set(product_urls))
 			# Update the big product list after each collection iteration. We don't want an all-or-nothing update
-			self.file_manager.write_products(os.path.join(self.directory, "all_products.json"), product_urls)
+			self.data_manager.write_product_details(os.path.join(self.directory, "all_products.json"), product_urls)
 
 		print(f"Found {len(product_urls)} products.")
 
@@ -110,7 +114,7 @@ class MSScraper(Scraper):
 		while True:
 			paginated_url = self.__get_page_url(url, page_no)
 
-			results = list(self.__refresh_page_products(window, paginated_url, page_no))
+			results = list(self.__refresh_catalog_products_page(window, paginated_url, page_no))
 			product_urls += results
 			page_no += 1
 
@@ -119,7 +123,7 @@ class MSScraper(Scraper):
 
 		return product_urls
 
-	def __refresh_page_products(self, window: Page, url: str, page_no: int):
+	def __refresh_catalog_products_page(self, window: Page, url: str, page_no: int):
 		product_grid = "div.grid_container__flAnn"
 		product_selector = "div.grid_container__flAnn a[class*=product-card]"
 
@@ -142,6 +146,12 @@ class MSScraper(Scraper):
 		for box in product_boxes.all():
 			product_url = box.get_attribute("href")
 			products.append(self.base_url + product_url)
+			product = DetailsRequestMsg(
+				"ms",
+				product_url,
+				datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+			)
+			self.publisher.publish(product)
 		products = set(products)
 
 		return products
@@ -155,7 +165,7 @@ class MSScraper(Scraper):
 
 	def load_products(self):
 		results = {}
-		products = self.file_manager.read_products(os.path.join(self.directory, "all_products.json"))
+		products = self.data_manager.read_products(os.path.join(self.directory, "all_products.json"))
 		for p in products:
 			results[p] = "ms"
 		return results
@@ -266,7 +276,7 @@ class MSScraper(Scraper):
 			))
 
 		for p in products:
-			self.file_manager.write_products(
+			self.data_manager.write_product_details(
 				os.path.join(self.directory, f"products/{p.id}.json"), p.to_dict())
 
 		return products

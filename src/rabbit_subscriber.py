@@ -1,4 +1,6 @@
 import pika
+import time
+
 from pika.adapters.select_connection import SelectConnection
 from pika.channel import Channel
 

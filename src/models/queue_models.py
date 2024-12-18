@@ -6,10 +6,10 @@ from dataclasses_json import dataclass_json
 @dataclass
 class CatalogueRequestMsg:
 	store_code: str # HM / MS / ASOS
-	
+
 @dataclass_json
 @dataclass
-class ProductUrl:
+class DetailsRequestMsg:
 	store_code: str
 	url: dict
 	read_time: str

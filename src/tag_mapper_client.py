@@ -28,7 +28,7 @@ class TagCollection:
 
 class TagMapper:
 	def resolve_tags(store_text: list[str]) -> TagCollection:
-		url = f"https://localhost:44357/ClothingMapper"
+		url = f"https://localhost:44357/ClothingMapper" # TODO - Config
 		try:
 			response = requests.post(url, json=store_text, verify=not __debug__)
 			if (response.ok):

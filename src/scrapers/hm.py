@@ -1,16 +1,15 @@
-import os.path
 from datetime import datetime
-
-from data.file_manager import FileManager
-from models import *
+from data.catalogue_writer import CatalogueWriter
+from models.opensearch_models import *
+from data.basepublisher import BasePublisher
+from models.queue_models import DetailsRequestMsg
 from scrapers.scraper import Scraper
-from tag_mapper import *
+from tag_mapper_client import *
 from playwright.sync_api import Page
 import re
 import logging
 import random
 import time
-
 
 class HMScraper(Scraper):
 	directory = "../../DATA/stores/hm"
@@ -24,19 +23,16 @@ class HMScraper(Scraper):
 		'girls_teen': 'https://www2.hm.com/en_gb/kids/girls-9-14y/view-all.html'
 	}
 
-	def __init__(self, file_manager: FileManager):
-		self.file_manager = file_manager
+	def __init__(self, catalogue_writer: CatalogueWriter, publisher: BasePublisher):
+		self.publisher = publisher
+		self.catalogue_writer = catalogue_writer
 
 	def get_catalogue(self, window: Page) -> list[str]:
 		product_urls = []
-
 		for n, url in self.product_collections.items():
 			product_urls += self.__refresh_category_products(window, url)
-			# Update the big product list after each collection iteration. We don't want an all-or-nothing update
-			self.file_manager.write_products(os.path.join(self.directory, "all_products.json"), product_urls)
 
 		print(f"Found {len(product_urls)} products.")
-
 		return product_urls
 
 	def __get_page_url(self, url: str, page_no: int) -> str:
@@ -47,7 +43,7 @@ class HMScraper(Scraper):
 		page_no = 1
 
 		while True:
-			results = list(self.__refresh_page_products(window, url, page_no))
+			results = list(self.__refresh_category_products_page(window, url, page_no))
 
 			product_urls += results
 			page_no += 1
@@ -57,7 +53,7 @@ class HMScraper(Scraper):
 
 		return product_urls
 
-	def __refresh_page_products(self, window: Page, url: str, page_no: int):
+	def __refresh_category_products_page(self, window: Page, url: str, page_no: int):
 		product_selector = "#products-listing-section ul li .splide ul li:first-of-type a"
 		page_no_selector = '#products-listing-section nav[role="navigation"] ul li a[aria-current="true"]'
 
@@ -76,6 +72,12 @@ class HMScraper(Scraper):
 			for box in product_boxes.all():
 				product_url = box.get_attribute("href")
 				products.append(product_url)
+				product = DetailsRequestMsg(
+					"hm",
+					product_url,
+					datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+				)
+				self.publisher.publish(product)
 			logging.info(f"Successfully read page {url}")
 		except:
 			logging.exception(f"Failed to load page {url}")
@@ -83,18 +85,11 @@ class HMScraper(Scraper):
 
 		return products
 
-	def load_products(self):
-		results = {}
-		products = self.file_manager.read_products(os.path.join(self.directory, "all_products.json"))
-		for p in products:
-			results[p] = "hm"
-		return results
-
 	def get_product_details(self, window: Page, url: str) -> list[InventoryItem]:
 		selectors = dict({
-			'title': 'h1',
+			'title': 'main h1',
 			'brand': '#__next > div.b0981f.d0fdd1 > div.rOGz > div > div > div.c58e1c.fe1f77.d12085.c9ee6e > div > div > div.ff0cbd.aef620 > div > h2 > a',
-			'price': '#__next > div.b0981f.d0fdd1 > div.rOGz > div > div > div.c58e1c.fe1f77.d12085.c9ee6e > div > div > div.e26896 > .edbe20.ac3d9e.d9ca8b.e29fbf:has-text("£")',
+			'price': '#__next > main > div.rOGz > div > div > div > div > div > div.e26896.acef13 > span:has-text("£")',
 			'sizes': '[data-testid="size-selector"] label', ## id^=sizeButton-*
 			'images': 'ul[data-testid="grid-gallery"] img',
 			'materials_accordion': '#toggle-materialsAndSuppliersAccordion',
@@ -119,8 +114,8 @@ class HMScraper(Scraper):
 
 		window.wait_for_selector(selectors["title"])
 
-		store_product_id = url.split(".")[-2]
-		id = f"hm-{store_product_id}"
+		hm_product_id = url.split(".")[-2]
+		id = f"hm-{hm_product_id}"
 
 		title = window.locator(selectors["title"]).text_content().strip()
 		store = brand = "H&M"
@@ -160,7 +155,7 @@ class HMScraper(Scraper):
 		if window.locator(selectors["brand"]).count() > 0:
 			brand = window.locator(selectors["brand"]).text_content().strip()
 
-		raw_categories = [store_product_id]
+		raw_categories = [hm_product_id]
 		raw_categories += [category.text_content().strip().lower() for category in
 						  window.locator(selectors["categories"]).all()]
 		raw_categories += [info.text_content().strip().lower() for info in window.locator(selectors["length"]).all()]
@@ -224,7 +219,7 @@ class HMScraper(Scraper):
 		products = [InventoryItem(
 			id,
 			"hm",
-			store_product_id,
+			hm_product_id,
 			url,
 			title,
 			store,
@@ -244,7 +239,6 @@ class HMScraper(Scraper):
 		)]
 
 		for p in products:
-			self.file_manager.write_products(
-				os.path.join(self.directory, f"products/{p.store_id}.json"), p.to_dict())
+			self.catalogue_writer.push_product_details(p)
 
 		return products

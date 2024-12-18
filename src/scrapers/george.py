@@ -11,9 +11,11 @@ import requests
 from playwright.sync_api import Page
 
 from data.file_manager import FileManager
-from models import *
+from models.opensearch_models import *
+from data.basepublisher import BasePublisher
+from models.queue_models import DetailsRequestMsg
 from scrapers.scraper import Scraper
-from tag_mapper import TagMapper
+from tag_mapper_client import TagMapper
 
 
 class GeorgeScraper(Scraper):
@@ -30,7 +32,8 @@ class GeorgeScraper(Scraper):
 	}
 	new_session = True
 
-	def __init__(self, file_manager: FileManager):
+	def __init__(self, file_manager: FileManager, publisher: BasePublisher):
+		self.publisher = publisher
 		self.file_manager = file_manager
 
 	@dataclass_json
@@ -64,7 +67,7 @@ class GeorgeScraper(Scraper):
 			product_zips += self.__refresh_category_products(category)
 			product_zips = list(set(product_zips))
 			# Update the big product list after each collection iteration. We don't want an all-or-nothing update
-			self.file_manager.write_products(os.path.join(self.directory, "all_products.json"), product_zips)
+			self.file_manager.write_product_details(os.path.join(self.directory, "all_products.json"), product_zips)
 
 		print(f"Found {len(product_zips)} products.")
 
@@ -75,7 +78,7 @@ class GeorgeScraper(Scraper):
 		page_no = 1
 
 		while True:
-			results = list(self.__refresh_page_products(page_no, category))
+			results = list(self.__refresh_category_products_page(page_no, category))
 			product_gzip += results
 			page_no += 1
 
@@ -84,7 +87,7 @@ class GeorgeScraper(Scraper):
 
 		return product_gzip
 
-	def __refresh_page_products(self, page_no: int, category: str):
+	def __refresh_category_products_page(self, page_no: int, category: str):
 		parsed_products = self.__query_products(page_no, category)
 
 		products = []
@@ -133,11 +136,11 @@ class GeorgeScraper(Scraper):
 			if (response.ok):
 				results = []
 				for item in response.json()["results"][0]["hits"]:
-					url = f"https://direct.asda.com/george/{item.get('product_id', None)},default,pd.html"
-					results.append(self.AsdaProduct(
+					product_url = f"https://direct.asda.com/george/{item.get('product_id', None)},default,pd.html"
+					product = self.AsdaProduct(
 						current_price=item.get('current_price', None),
 						product_id=item.get('product_id', None),
-						url=url,
+						url=product_url,
 						name=item.get('name', None),
 						colour=item.get('colour', None),
 						size=item.get('size', None),
@@ -155,7 +158,14 @@ class GeorgeScraper(Scraper):
 						length=item.get('length', None),
 						genderCategory=item.get('genderCategory', None),
 						master_id=item.get('master_id', None),
-					))
+					)
+					results.append(product)
+					subproduct = DetailsRequestMsg(
+						"hm",
+						product_url,
+						datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+					)
+					self.publisher.publish(subproduct)
 				return results
 			else:
 				logging.error(
@@ -284,7 +294,7 @@ class GeorgeScraper(Scraper):
 			))
 
 		for p in products:
-			self.file_manager.write_products(
+			self.file_manager.write_product_details(
 				os.path.join(self.directory, f"products/{p.id}.json"), p.to_dict())
 
 		return products
