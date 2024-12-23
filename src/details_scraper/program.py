@@ -14,7 +14,7 @@ from setup import LogInstaller
 
 
 def run():
-	opensearch_writer = OpenSearchWriter("")
+	opensearch_writer = OpenSearchWriter("clothing_details") # TODO - Config
 	details_publisher = CatalogPublisher(opensearch_writer)
 
 	scrapers = {
@@ -24,7 +24,7 @@ def run():
 		"george": GeorgeScraper(None, details_publisher)
 	}
 
-	rabbit_reader = RabbitReader("details_trigger", scrapers) # TODO - Config
+	rabbit_reader = RabbitReader("/", "details_trigger", scrapers) # TODO - Config
 	rabbit_reader.run()
 
 def setup():

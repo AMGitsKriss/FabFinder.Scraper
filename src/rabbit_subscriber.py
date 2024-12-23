@@ -4,18 +4,20 @@ import time
 from pika.adapters.select_connection import SelectConnection
 from pika.channel import Channel
 
+
 class RabbitSubscriberBlocking:
 	connection: SelectConnection
 	channel: Channel
 
-	def __init__(self, **callbacks):
+	def __init__(self, queue_name: str, queue_callback):
 		self.connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 		self.channel = self.connection.channel()
 
-		for q_name in callbacks:
-			self.channel.basic_consume(queue=q_name,
-							  auto_ack=True,
-							  on_message_callback=callbacks[q_name])
+		self.channel.queue_declare(queue = queue_name, durable=True, exclusive=False, auto_delete=False)
+		self.channel.basic_consume(queue=queue_name,
+								   auto_ack=False,
+								   on_message_callback=queue_callback)
+
 	def start(self):
 		self.channel.start_consuming()
 
@@ -24,6 +26,7 @@ class RabbitSubscriberBlocking:
 
 	def is_running(self) -> bool:
 		return self.connection.is_open()
+
 
 class RabbitSubscriberNonBlock:
 	connection: SelectConnection

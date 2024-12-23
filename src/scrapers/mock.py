@@ -12,14 +12,15 @@ class MockScraper(Scraper):
 	def __init__(self, publisher: BasePublisher):
 		self.publisher = publisher
 
-	def get_catalogue(self, window: Page, writer_callback, publisher: BasePublisher) -> list[DetailsRequestMsg]:
+	def get_catalogue(self, window: Page) -> list[DetailsRequestMsg]:
 		results = [
 			DetailsRequestMsg("mock", "http://localhost/123", datetime.now().strftime('%Y-%m-%dT%H:%M:%S')),
 			DetailsRequestMsg("mock", "http://localhost/456", datetime.now().strftime('%Y-%m-%dT%H:%M:%S')),
 			DetailsRequestMsg("mock", "http://localhost/789", datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
 		]
 
-		self.publisher.publish(results)
+		for product in results:
+			self.publisher.publish(product)
 
 		return results
 

@@ -5,7 +5,7 @@ from data.basepublisher import BasePublisher
 
 
 class Scraper:
-	def get_catalogue(self, window: Page, writer_callback, publisher: BasePublisher) -> list[str]:
+	def get_catalogue(self, window: Page) -> list[str]:
 		pass
 
 	def get_product_details(self, window: Page, url: str) -> list[InventoryItem]:

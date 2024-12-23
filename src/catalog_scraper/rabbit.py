@@ -1,3 +1,4 @@
+import dataclasses
 import json
 import logging
 import os
@@ -7,7 +8,6 @@ import pika
 from playwright.sync_api import sync_playwright, Page
 
 from data.basepublisher import BasePublisher
-from data.base_manager import BaseManager
 from models.queue_models import CatalogueRequestMsg
 from rabbit_subscriber import RabbitSubscriberBlocking
 from scrapers.scraper import Scraper
@@ -15,10 +15,11 @@ from scrapers.scraper import Scraper
 
 class RabbitReader:
 	scrapers: dict[str, Scraper]
-	window: Page
+	window: Page  # Storign the window here is a bit of a smell...
 
-	def __init__(self, exchange: str, scrapers: dict[str, Scraper]):
+	def __init__(self, exchange: str, queue: str, scrapers: dict[str, Scraper]):
 		self.exchange = exchange
+		self.queue = queue
 		self.scrapers = scrapers
 
 	def run(self):
@@ -27,20 +28,22 @@ class RabbitReader:
 			self.window = browser.new_page()
 
 			subscriber = RabbitSubscriberBlocking(
-				read_catalogue=self.catalogue_callback,
+				queue_name=self.queue,
+				queue_callback=self.queue_callback,
 			)
 			subscriber.start()
 
 			while subscriber.is_running():
 				time.sleep(5)  # TODO - Config
 
-	def catalogue_callback(self, ch, method, properties, message_b):
+	def queue_callback(self, channel, method, properties, message_b):
+		# TODO - Error handle this callback. The desired scraper may not be loaded.
 		message = CatalogueRequestMsg(**json.loads(message_b))
 		scraper = self.scrapers[message.store_code]
-		self.read_store_catalogue(self.window, scraper)
-
-	def catalogue_write_callback(self, data_manager: BaseManager, directory: str, product_urls: list[str]):
-		data_manager.write_product_details(os.path.join(directory, "all_products.json"), product_urls)
+		if not self.read_store_catalogue(self.window, scraper):
+			channel.basic_reject(method.delivery_tag)
+		else:
+			channel.basic_ack(method.delivery_tag)
 
 	def read_store_catalogue(self, window: Page, scraper: Scraper):
 		try:
@@ -54,17 +57,22 @@ class RabbitReader:
 
 
 class RabbitWriter(BasePublisher):
-	def __init__(self, exchange: str):
+	def __init__(self, exchange: str, queue: str):
 		self.exchange = exchange
-		self.connection = pika.BlockingConnection(
-			pika.ConnectionParameters(host='localhost'))
+		self.queue = queue
+		self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
 		self.channel = self.connection.channel()
-		self.channel.exchange_declare(exchange='logs', exchange_type='fanout')
+		self.channel.confirm_delivery()
+		self.channel.exchange_declare(exchange=self.exchange, exchange_type='fanout')
+		self.channel.queue_declare(queue = self.queue, durable=True, exclusive=False, auto_delete=False)
+		self.channel.queue_bind(exchange=exchange, queue=queue)
 
 	def publish(self, data):
 		try:
-			message: str = json.dumps(data, ensure_ascii=False, indent=4)
-			self.channel.basic_publish(exchange=self.exchange, routing_key='', body=message)
-		except:
-			logging.exception(f"Failed to write file {message}")
+			message = json.dumps(dataclasses.asdict(data), ensure_ascii=False, indent=4)
+			self.pub_result = self.channel.basic_publish(exchange=self.exchange, routing_key=self.queue, body=message)
+		except Exception as ex:
+			logging.exception(ex, f"Failed to write file {message}")
 			print(f"Failed to write file {message}")
+			# TODO - Chanel closed errors?
+		pass

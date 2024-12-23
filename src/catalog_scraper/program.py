@@ -13,19 +13,19 @@ from setup import LogInstaller
 
 
 def run():
-	rabbit_writer = RabbitWriter("details_trigger") # TODO - Config
-	opensearch_writer = OpenSearchWriter("")
+	rabbit_writer = RabbitWriter("/", "details_trigger") # TODO - Config
+	opensearch_writer = OpenSearchWriter("clothing_catalog") # TODO - Config
 	catalog_publisher = CatalogPublisher(rabbit_writer, opensearch_writer)
 	file_manager = FileManager() # TODO - Remove
 
 	scrapers = {
-		"mock": MockScraper(file_manager, catalog_publisher),
-		"hm": HMScraper(file_manager, catalog_publisher),
+		"mock": MockScraper(catalog_publisher),
+		"hm": HMScraper(None, catalog_publisher),
 		"ms": MSScraper(file_manager, catalog_publisher),
 		"george": GeorgeScraper(file_manager, catalog_publisher)
 	}
 
-	rabbit_reader = RabbitReader("catalogue_trigger", scrapers) # TODO - Config
+	rabbit_reader = RabbitReader("/", "catalogue_trigger", scrapers) # TODO - Config
 	rabbit_reader.run()
 
 def setup():

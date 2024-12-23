@@ -8,13 +8,15 @@ from models.queue_models import CatalogueRequestMsg
 from rabbit_subscriber import RabbitSubscriberBlocking
 from scrapers.scraper import Scraper
 
+
 # TODO - Same code as in catalog scraper. Share it.
 class RabbitReader:
 	scrapers: dict[str, Scraper]
 	window: Page
 
-	def __init__(self, exchange: str, scrapers: dict[str, Scraper]):
+	def __init__(self, exchange: str, queue: str, scrapers: dict[str, Scraper]):
 		self.exchange = exchange
+		self.queue = queue
 		self.scrapers = scrapers
 
 	def run(self):
@@ -23,6 +25,7 @@ class RabbitReader:
 			self.window = browser.new_page()
 
 			subscriber = RabbitSubscriberBlocking(
+				queue_name=self.queue,
 				read_catalogue=self.catalogue_callback,
 			)
 			subscriber.start()
