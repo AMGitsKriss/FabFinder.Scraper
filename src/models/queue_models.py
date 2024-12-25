@@ -11,6 +11,7 @@ class CatalogueRequestMsg:
 @dataclass
 class DetailsRequestMsg:
 	store_code: str
-	url: dict
+	store_id: str
+	url: str
 	read_time: str
 

@@ -14,9 +14,9 @@ class MockScraper(Scraper):
 
 	def get_catalogue(self, window: Page) -> list[DetailsRequestMsg]:
 		results = [
-			DetailsRequestMsg("mock", "http://localhost/123", datetime.now().strftime('%Y-%m-%dT%H:%M:%S')),
-			DetailsRequestMsg("mock", "http://localhost/456", datetime.now().strftime('%Y-%m-%dT%H:%M:%S')),
-			DetailsRequestMsg("mock", "http://localhost/789", datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
+			DetailsRequestMsg("mock", "123", "http://localhost/123", datetime.now().strftime('%Y-%m-%dT%H:%M:%S')),
+			DetailsRequestMsg("mock", "456", "http://localhost/456", datetime.now().strftime('%Y-%m-%dT%H:%M:%S')),
+			DetailsRequestMsg("mock", "789", "http://localhost/789", datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
 		]
 
 		for product in results:
@@ -50,6 +50,7 @@ class MockScraper(Scraper):
 			)
 		]
 
-		self.publisher.publish(results)
+		for item in results:
+			self.publisher.publish(item)
 
 		return results

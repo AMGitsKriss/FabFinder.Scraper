@@ -2,9 +2,8 @@ import sys
 
 import urllib3
 
-from data.file_manager import FileManager
 from details_scraper.opensearch import OpenSearchWriter
-from details_scraper.publish import CatalogPublisher
+from details_scraper.publish import DetailsPublisher
 from details_scraper.rabbit import RabbitReader
 from scrapers.george import GeorgeScraper
 from scrapers.hm import HMScraper
@@ -15,7 +14,7 @@ from setup import LogInstaller
 
 def run():
 	opensearch_writer = OpenSearchWriter("clothing_details") # TODO - Config
-	details_publisher = CatalogPublisher(opensearch_writer)
+	details_publisher = DetailsPublisher(opensearch_writer)
 
 	scrapers = {
 		"mock": MockScraper(details_publisher),

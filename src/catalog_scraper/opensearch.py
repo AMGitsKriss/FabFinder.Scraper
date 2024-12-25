@@ -36,6 +36,7 @@ class OpenSearchWriter(BasePublisher):
 				"mappings": {
 					"properties": {
 						"store_code": {"type": "keyword"},
+						"store_id": {"type": "keyword"},
 						"url": {"type": "keyword"},
 						"read_time": {"type": "date"}
 					}
@@ -45,7 +46,7 @@ class OpenSearchWriter(BasePublisher):
 
 	def publish(self, data: DetailsRequestMsg):
 		message = json.dumps(dataclasses.asdict(data), ensure_ascii=False, indent=4)
-		response = self.client.index(self.index, message)
+		response = self.client.index(self.index, id=data.store_id, body=message)
 
 		# TODO - Error handling.
 		if response is None:

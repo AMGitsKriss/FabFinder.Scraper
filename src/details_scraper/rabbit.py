@@ -4,7 +4,7 @@ import time
 
 from playwright.sync_api import sync_playwright, Page
 
-from models.queue_models import CatalogueRequestMsg
+from models.queue_models import DetailsRequestMsg
 from rabbit_subscriber import RabbitSubscriberBlocking
 from scrapers.scraper import Scraper
 
@@ -26,21 +26,24 @@ class RabbitReader:
 
 			subscriber = RabbitSubscriberBlocking(
 				queue_name=self.queue,
-				read_catalogue=self.catalogue_callback,
+				queue_callback=self.catalogue_callback
 			)
 			subscriber.start()
 
 			while subscriber.is_running():
 				time.sleep(5)  # TODO - Config
 
-	def catalogue_callback(self, ch, method, properties, message_b):
-		message = CatalogueRequestMsg(**json.loads(message_b))
+	def catalogue_callback(self, channel, method, properties, message_b):
+		message = DetailsRequestMsg(**json.loads(message_b))
 		scraper = self.scrapers[message.store_code]
-		self.read_store_catalogue(self.window, scraper)
+		if not self.read_product_details(self.window, scraper, message):
+			channel.basic_reject(method.delivery_tag)
+		else:
+			channel.basic_ack(method.delivery_tag)
 
-	def read_store_catalogue(self, window: Page, scraper: Scraper):
+	def read_product_details(self, window: Page, scraper: Scraper, message: DetailsRequestMsg):
 		try:
-			scraper.get_catalogue(window)
+			scraper.get_product_details(window, message.url)
 			return True
 		except Exception as ex:
 			store = type(scraper).__name__
