@@ -1,31 +1,16 @@
 import sys
+
 import urllib3
 
-from catalog_scraper.opensearch import OpenSearchWriter
-from data.file_manager import FileManager
-from catalog_scraper.publish import CatalogPublisher
-from catalog_scraper.rabbit import RabbitReader, RabbitWriter
-from scrapers.george import GeorgeScraper
-from scrapers.hm import HMScraper
-from scrapers.mock import MockScraper
-from scrapers.ms import MSScraper
-from setup import LogInstaller
+from catalog_scraper.rabbit import RabbitReader
+from config import CATALOGUE_TRIGGER
+from setup import LogInstaller, ScraperSetup
 
 
 def run():
-	rabbit_writer = RabbitWriter("/", "details_trigger") # TODO - Config
-	opensearch_writer = OpenSearchWriter("clothing_catalog") # TODO - Config
-	catalog_publisher = CatalogPublisher(rabbit_writer, opensearch_writer)
-	file_manager = FileManager() # TODO - Remove
+	scrapers = ScraperSetup().get_scrapers()
 
-	scrapers = {
-		"mock": MockScraper(catalog_publisher),
-		"hm": HMScraper(None, catalog_publisher),
-		"ms": MSScraper(file_manager, catalog_publisher),
-		"george": GeorgeScraper(file_manager, catalog_publisher)
-	}
-
-	rabbit_reader = RabbitReader("/", "catalogue_trigger", scrapers) # TODO - Config
+	rabbit_reader = RabbitReader("/", CATALOGUE_TRIGGER, scrapers) # TODO - Config
 	rabbit_reader.run()
 
 def setup():

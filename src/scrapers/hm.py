@@ -11,8 +11,10 @@ import logging
 import random
 import time
 
+
 class HMScraper(Scraper):
 	directory = "../../DATA/stores/hm"
+	store_code = "hm"
 	products_per_page = 36
 	product_collections = {
 		'men': 'https://www2.hm.com/en_gb/men/shop-by-product/view-all.html',
@@ -73,7 +75,7 @@ class HMScraper(Scraper):
 				product_url = box.get_attribute("href")
 				products.append(product_url)
 				product = DetailsRequestMsg(
-					"hm",
+					store_code,
 					product_url,
 					datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
 				)
@@ -90,7 +92,7 @@ class HMScraper(Scraper):
 			'title': 'main h1',
 			'brand': '#__next > div.b0981f.d0fdd1 > div.rOGz > div > div > div.c58e1c.fe1f77.d12085.c9ee6e > div > div > div.ff0cbd.aef620 > div > h2 > a',
 			'price': '#__next > main > div.rOGz > div > div > div > div > div > div.e26896.acef13 > span:has-text("£")',
-			'sizes': '[data-testid="size-selector"] label', ## id^=sizeButton-*
+			'sizes': '[data-testid="size-selector"] label',  ## id^=sizeButton-*
 			'images': 'ul[data-testid="grid-gallery"] img',
 			'materials_accordion': '#toggle-materialsAndSuppliersAccordion',
 			'origin_button': '#section-materialsAndSuppliersAccordion > div > div > button',
@@ -157,7 +159,7 @@ class HMScraper(Scraper):
 
 		raw_categories = [hm_product_id]
 		raw_categories += [category.text_content().strip().lower() for category in
-						  window.locator(selectors["categories"]).all()]
+						   window.locator(selectors["categories"]).all()]
 		raw_categories += [info.text_content().strip().lower() for info in window.locator(selectors["length"]).all()]
 		raw_categories.append(window.locator(selectors["selected_colour"]).get_attribute("title").lower())
 		raw_categories.append(fit)

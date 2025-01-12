@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from catalog_scraper.rabbit import RabbitWriter
 from data.opensearch_manager import OpensearchManager
 from models.opensearch_models import InventoryItem
 from models.queue_models import DetailsRequestMsg
+from rabbit_publisher import RabbitWriter
+
 
 class CatalogueWriter:
 	def __init__(self, rabbit_writer: RabbitWriter, opensearch: OpensearchManager):

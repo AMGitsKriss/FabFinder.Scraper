@@ -2,6 +2,7 @@ import urllib3
 from playwright.sync_api import sync_playwright
 import unittest
 
+from data.basepublisher import BasePublisher
 from data.file_manager import FileManager
 from scrapers.ms import MSScraper
 from setup import LogInstaller
@@ -13,7 +14,7 @@ class MyTestCase(unittest.TestCase):
 	def setUp(self):
 		LogInstaller.install()
 		urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-		self.scraper = MSScraper(FileManager())
+		self.scraper = MSScraper(FileManager(), BasePublisher())
 
 	def test_catalogue_page(self):
 		with sync_playwright() as pw:

@@ -2,28 +2,13 @@ import sys
 
 import urllib3
 
-from details_scraper.opensearch import OpenSearchWriter
-from details_scraper.publish import DetailsPublisher
 from details_scraper.rabbit import RabbitReader
-from scrapers.george import GeorgeScraper
-from scrapers.hm import HMScraper
-from scrapers.mock import MockScraper
-from scrapers.ms import MSScraper
-from setup import LogInstaller
+from setup import LogInstaller, ScraperSetup
 
 
 def run():
-	opensearch_writer = OpenSearchWriter("clothing_details") # TODO - Config
-	details_publisher = DetailsPublisher(opensearch_writer)
-
-	scrapers = {
-		"mock": MockScraper(details_publisher),
-		"hm": HMScraper(None, details_publisher),
-		"ms": MSScraper(None, details_publisher),
-		"george": GeorgeScraper(None, details_publisher)
-	}
-
-	rabbit_reader = RabbitReader("/", "details_trigger", scrapers) # TODO - Config
+	scrapers = ScraperSetup().get_scrapers()
+	rabbit_reader = RabbitReader("/", "03_details_trigger", scrapers) # TODO - Config
 	rabbit_reader.run()
 
 def setup():

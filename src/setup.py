@@ -3,6 +3,13 @@ import logging
 import traceback
 import seqlog
 
+from publisher_collection import RabbitPublisherCollection, OpenSearchPublisherCollection
+from scrapers.george import GeorgeScraper
+from scrapers.hm import HMScraper
+from scrapers.mock import MockScraper
+from scrapers.ms import MSScraper
+from scrapers.scraper import Scraper
+
 
 class LogInstaller:
 	@staticmethod
@@ -28,3 +35,17 @@ class LogInstaller:
 	@staticmethod
 	def log_to_console(e):  # type: (requests.RequestException) -> None
 		traceback.format_exc()
+
+class ScraperSetup:
+	def get_scrapers(self) -> dict[str, Scraper]:
+		rabbit_publisher = RabbitPublisherCollection()
+		opensearch_publisher = OpenSearchPublisherCollection()
+
+		scrapers = {
+			"mock": MockScraper(rabbit_publisher, opensearch_publisher),
+			"george": GeorgeScraper(rabbit_publisher, opensearch_publisher),
+			"hm": HMScraper(rabbit_publisher, opensearch_publisher),
+			"ms": MSScraper(rabbit_publisher, opensearch_publisher)
+		}
+		return scrapers
+

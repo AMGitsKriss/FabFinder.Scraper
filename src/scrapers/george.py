@@ -2,7 +2,6 @@ import base64
 import gzip
 import json
 import logging
-import os
 import re
 import urllib
 from datetime import datetime
@@ -10,16 +9,16 @@ from datetime import datetime
 import requests
 from playwright.sync_api import Page
 
-from data.file_manager import FileManager
 from models.opensearch_models import *
-from data.basepublisher import BasePublisher
-from models.queue_models import DetailsRequestMsg
+from models.queue_models import DetailsRequestMsg, CatalogueRequestMsg
+from publisher_collection import RabbitPublisherCollection, OpenSearchPublisherCollection
 from scrapers.scraper import Scraper
+from config import *
 from tag_mapper_client import TagMapper
 
 
 class GeorgeScraper(Scraper):
-	directory = "../../DATA/stores/george"
+	store_code = "george"
 	products_per_page = 20
 	product_collections = {
 		'men': 'D2M1G10',
@@ -32,9 +31,11 @@ class GeorgeScraper(Scraper):
 	}
 	new_session = True
 
-	def __init__(self, file_manager: FileManager, publisher: BasePublisher):
-		self.publisher = publisher
-		self.file_manager = file_manager
+	def __init__(self, rabbit_publisher: RabbitPublisherCollection,
+				 opensearch_publisher: OpenSearchPublisherCollection):
+		self.rabbit_publisher = rabbit_publisher
+		self.opensearch_publisher = opensearch_publisher
+		self.logger = logging.getLogger(__name__)
 
 	@dataclass_json
 	@dataclass
@@ -60,35 +61,35 @@ class GeorgeScraper(Scraper):
 		genderCategory: list[str]
 		master_id: str
 
-	def get_catalogue(self, window: Page) -> list[str]:
-		product_zips = []
+	def get_categories(self):
+		results = []
 
-		for n, category in self.product_collections.items():
-			product_zips += self.__refresh_category_products(category)
-			product_zips = list(set(product_zips))
-			# Update the big product list after each collection iteration. We don't want an all-or-nothing update
-			self.file_manager.write_product_details(os.path.join(self.directory, "all_products.json"), product_zips)
+		for category_name, category_value in self.product_collections.items():
+			category_msg = CatalogueRequestMsg(
+				self.store_code,
+				category_name,
+				category_value,
+				1
+			)
+			self.rabbit_publisher.get(CATALOGUE_TRIGGER).publish(category_msg)
+			results.append(category_msg)
 
-		print(f"Found {len(product_zips)} products.")
+		return self.product_collections
+
+	def get_catalogue(self, window: Page, category_msg: CatalogueRequestMsg) -> list[str]:
+		product_zips = self.__refresh_category_products_page(
+			category_msg
+		)
+
+		# Next Page!
+		if len(product_zips) == self.products_per_page:
+			category_msg.page += 1
+			self.rabbit_publisher.get(CATALOGUE_TRIGGER).publish(category_msg)
 
 		return product_zips
 
-	def __refresh_category_products(self, category: str) -> list[str]:
-		product_gzip = []
-		page_no = 1
-
-		while True:
-			results = list(self.__refresh_category_products_page(page_no, category))
-			product_gzip += results
-			page_no += 1
-
-			if len(results) < self.products_per_page:
-				break
-
-		return product_gzip
-
-	def __refresh_category_products_page(self, page_no: int, category: str):
-		parsed_products = self.__query_products(page_no, category)
+	def __refresh_category_products_page(self, category_msg: CatalogueRequestMsg) -> list:
+		parsed_products = self.__query_products(category_msg.page, category_msg.url)
 
 		products = []
 
@@ -97,7 +98,24 @@ class GeorgeScraper(Scraper):
 			item_bytes = item_json.encode(encoding="utf-8")
 			item_gzip = gzip.compress(item_bytes)
 			item_b64 = base64.b64encode(item_gzip)
-			products.append(str(item_b64, "utf-8"))
+
+			details_msg = DetailsRequestMsg(
+				self.store_code,
+				item.product_id,
+				str(item_b64, "utf-8"),
+				datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+			)
+
+			products.append(details_msg.url)
+			self.rabbit_publisher.get(DETAILS_TRIGGER).publish(details_msg)
+			self.opensearch_publisher.get(CATALOGUE_INDEX).publish(details_msg)
+
+		self.logger.info("Read {scraper}. {category_name}: {category_url}. Page: {page}. Products: {product_count}",
+						 scraper=self.store_code,
+						 category_name=category_msg.name,
+						 category_url=category_msg.url,
+						 page=category_msg.page,
+						 product_count=len(products))
 
 		return products
 
@@ -160,29 +178,16 @@ class GeorgeScraper(Scraper):
 						master_id=item.get('master_id', None),
 					)
 					results.append(product)
-					subproduct = DetailsRequestMsg(
-						"hm",
-						product_url,
-						datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-					)
-					self.publisher.publish(subproduct)
 				return results
 			else:
-				logging.error(
+				self.logger.error(
 					msg="Asda returned with {ResponseCode}.",
 					ResponseCode=response.status_code,
 					Payload=data)
 
 		except Exception as ex:
-			logging.exception("Failed to parse Asda's response.", Url=url, Payload=data)
+			self.logger.exception("Failed to parse Asda's response.", Url=url, Payload=data)
 			return []
-
-	def load_products(self):
-		results = {}
-		products = self.file_manager.read_products(os.path.join(self.directory, "all_products.json"))
-		for p in products:
-			results[p] = "george"
-		return results
 
 	def get_product_details(self, window: Page, item: str) -> list[InventoryItem]:
 		selectors = dict({
@@ -225,10 +230,10 @@ class GeorgeScraper(Scraper):
 				elif number != "" and fit == "l":
 					fit = "long"
 				elif number != "" and fit != "":
-					logging.warning(f"There was no fit mapped to the string '{fit}' on {item.url}")
+					self.logger.warning(f"There was no fit mapped to the string '{fit}' on {item.url}")
 					fit = "regular"
 				else:
-					logging.warning(f"There was no mapped fit for the string '{fit}' on {item.url}")
+					self.logger.warning(f"There was no mapped fit for the string '{fit}' on {item.url}")
 					fit = "regular"
 
 				if fit not in size_dict:
@@ -294,8 +299,7 @@ class GeorgeScraper(Scraper):
 			))
 
 		for p in products:
-			self.file_manager.write_product_details(
-				os.path.join(self.directory, f"products/{p.id}.json"), p.to_dict())
+			self.opensearch_publisher.get(DETAILS_INDEX).publish(p)
 
 		return products
 
