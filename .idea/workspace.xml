@@ -5,27 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ace769a8-fc7d-4ca4-aae0-176a86ef14ff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/opensearch.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/publisher_collection.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/rabbit_publisher.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/catalog_scraper/opensearch.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/catalog_scraper/program.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/catalog_scraper/program.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/catalog_scraper/publish.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/catalog_scraper/rabbit.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/catalog_scraper/rabbit.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data/catalogue_writer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/catalogue_writer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/details_scraper/opensearch.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/details_scraper/program.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/details_scraper/program.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/details_scraper/publish.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/queue_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/queue_models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/opensearch_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/opensearch_models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/scrapers/george.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/scrapers/george.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/scrapers/hm.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/scrapers/hm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/scrapers/mock.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/scrapers/mock.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/scrapers/scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/scrapers/scraper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/george_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/george_test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/ms_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/ms_test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,7 +102,7 @@
       <recent name="C:\Users\Kriss\Desktop\FabFinder Dev\FabFinder.Scraper\src\queue" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Catalog Scraper">
+  <component name="RunManager" selected="Python.Details Scraper">
     <configuration name="Catalog Scraper" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="FabFinder.Scraper" />
       <option name="ENV_FILES" value="" />
@@ -226,9 +209,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.Details Scraper" />
         <item itemvalue="Python.Catalog Scraper" />
         <item itemvalue="Python.Category Scraper" />
-        <item itemvalue="Python.Details Scraper" />
         <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_adsa_api_query" />
         <item itemvalue="Python tests.Python tests for ms_test.MyTestCase.test_shoes" />
       </list>
@@ -346,12 +329,6 @@
           <url>file://$PROJECT_DIR$/src/scrapers/george.py</url>
           <line>182</line>
           <option name="timeStamp" value="127" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <condition expression="mapper_response.colours.tags is None or len(mapper_response.colours.tags) == 0" language="Python" />
-          <url>file://$PROJECT_DIR$/src/scrapers/george.py</url>
-          <line>276</line>
-          <option name="timeStamp" value="159" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/details_scraper/rabbit.py</url>

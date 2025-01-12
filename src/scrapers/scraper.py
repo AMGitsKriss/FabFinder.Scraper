@@ -19,5 +19,5 @@ class Scraper:
 		# If the page is full, it will then auto-queue the next page.
 		pass
 
-	def get_product_details(self, window: Page, url: str) -> list[InventoryItem]:
+	def get_product_details(self, window: Page, url: str) -> InventoryItem:
 		pass

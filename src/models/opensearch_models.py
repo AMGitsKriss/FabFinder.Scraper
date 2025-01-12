@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
 
+
 @dataclass_json
 @dataclass
 class CompositionDetail:
 	title: str
 	composition: dict
+
 
 @dataclass_json
 @dataclass
@@ -24,11 +26,18 @@ class InventoryItem:
 	image_urls: list[str]
 	audiences: list[str]
 	sizes: list[str]
-	fit: str
 	colour: list[str]
 	tags: list[str]
 	origin: str
 	creation_time: str
+
+
+@dataclass_json
+@dataclass
+class Size:
+	value: str
+	fit: str
+	type: str
 
 
 @dataclass_json

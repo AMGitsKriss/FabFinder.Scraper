@@ -189,7 +189,7 @@ class GeorgeScraper(Scraper):
 			self.logger.exception("Failed to parse Asda's response.", Url=url, Payload=data)
 			return []
 
-	def get_product_details(self, window: Page, item: str) -> list[InventoryItem]:
+	def get_product_details(self, window: Page, item: str) -> InventoryItem:
 		selectors = dict({
 			'sizes': '#main-region > div.main-page-wrapper > div > div > div> div > div > div.buying-block > div.attributes-wrapper > div > div > div[data-id="button-attribute-selector-size"] > span',
 			'colours': '#main-region > div.main-page-wrapper > div > div > div:nth-child(2) > div > div.buying-block-wrapper > div.buying-block > div.attributes-wrapper > div.product-colour-selector.image-swatches-selector.image-swatches-selector-grid-4 > div.colour-wrapper > div.colour.colour-swatch.selected.selectableUnavailable > img'
@@ -206,39 +206,11 @@ class GeorgeScraper(Scraper):
 
 		self.__check_session(window)
 
+		all_size_combinations = list(Size)
 		fit_sizes = window.locator(selectors["sizes"])
-		size_dict = dict()
 		for size_label in fit_sizes.all():
-			raw = size_label.inner_text().lower()
-			fit = "regular"
-
-			# shoes
-			if "uk" in raw and "eu" in raw:
-				size_dict[fit] = raw
-				continue
-
-			# Limit splitting to "32R" style sizes
-			if re.match(r'\d+[A-Za-z]$', raw):
-				number = re.sub("[^0-9]", "", raw)
-				fit = re.sub("[^a-zA-Z]", "", raw)
-				if number != "" and fit == "r":
-					fit = "regular"
-				elif number != "" and fit == "s":
-					fit = "short"
-				elif number != "" and fit == "t":
-					fit = "tall"
-				elif number != "" and fit == "l":
-					fit = "long"
-				elif number != "" and fit != "":
-					self.logger.warning(f"There was no fit mapped to the string '{fit}' on {item.url}")
-					fit = "regular"
-				else:
-					self.logger.warning(f"There was no mapped fit for the string '{fit}' on {item.url}")
-					fit = "regular"
-
-				if fit not in size_dict:
-					size_dict[fit] = []
-				size_dict[fit].append(number)
+			parsed_size = self.__parse_size(size_label, item)
+			all_size_combinations.extend(parsed_size)
 
 		colours = []
 		raw_colours = window.locator(selectors["colours"])
@@ -274,34 +246,84 @@ class GeorgeScraper(Scraper):
 			else:
 				item.genderCategory[i] = audience.lower()
 
-		products = []
-		for fit, sizes in size_dict.items():
-			products.append(InventoryItem(
-				f"george-{item.product_id}-{fit}",
-				"george",
-				item.product_id,
-				item.url,
-				item.name,
-				store,
-				item.brand,
-				item.current_price,
-				self.__parse_composition(item.fabric_composition),
-				mapper_response.pattern,
-				mapper_response.categories.tags,
-				image_urls,
-				item.genderCategory,
-				sizes,
-				fit,
-				mapper_response.colours.tags,
-				mapper_response.tags.tags,
-				"unknown",
-				creation_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-			))
+		product = InventoryItem(
+			f"george-{item.product_id}",
+			"george",
+			item.product_id,
+			item.url,
+			item.name,
+			store,
+			item.brand,
+			item.current_price,
+			self.__parse_composition(item.fabric_composition),
+			mapper_response.pattern,
+			mapper_response.categories.tags,
+			image_urls,
+			item.genderCategory,
+			all_size_combinations,
+			mapper_response.colours.tags,
+			mapper_response.tags.tags,
+			"unknown",
+			creation_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+		)
 
-		for p in products:
-			self.opensearch_publisher.get(DETAILS_INDEX).publish(p)
+		self.opensearch_publisher.get(DETAILS_INDEX).publish(product)
 
-		return products
+		return product
+
+	def __parse_size(self, size_text: str, item: InventoryItem) -> list[Size]:
+		results = list(Size)
+
+		child_sizes_regex = r"^[0-9]{1-2}-[0-9]{1-2}$"
+		size_with_fit = r"^\d+[A-Za-z]$"
+		letter_size_regex = r"^[a-zA-Z]$"
+		number_size_regex = r"^[0-9]{1-2}$"
+
+		# Account for age ranges "10-12"
+		if re.match(child_sizes_regex, size_text):
+			age_from_to = size_text.split("-")
+			age_from = int(age_from_to[0])
+			age_to = int(age_from_to[1])
+			for age in range(age_from, age_to):
+				results.append(Size(age, "regular", "age"))
+
+		# Account for shoes "uk8 eu42"
+		elif "uk" in size_text and "eu" in size_text:
+			size_units = size_text.split(" ")
+			for unit in size_units:
+				number = re.sub("[^0-9]", "", unit)
+				country = re.sub("[^a-zA-Z]", "", unit)
+				results.append(Size(number, country, "shoes"))
+
+		# Account for fits "32R"
+		elif re.match(size_with_fit, size_text):
+			number = re.sub("[^0-9]", "", size_text)
+			fit = re.sub("[^a-zA-Z]", "", size_text)
+			if number != "" and fit == "r":
+				fit = "regular"
+			elif number != "" and fit == "s":
+				fit = "short"
+			elif number != "" and fit == "t":
+				fit = "tall"
+			elif number != "" and fit == "l":
+				fit = "long"
+			else:
+				self.logger.warning(f"There was no mapped fit for the string '{fit}' on {item.url}")
+				fit = "regular"
+			results.append(Size(number, fit, "size"))
+
+		# Account for letters "M"
+		elif re.match(letter_size_regex, size_text):
+			results.append(Size(size_with_fit, "regular", "size"))
+
+		# Account for numbers "10"
+		elif re.match(number_size_regex, size_text):
+			results.append(Size(size_with_fit, "regular", "size"))
+
+		else:
+			self.logger.warning(f"There was no mapped size for the size '{size_text}' on {item.url}")
+
+		return results
 
 	def __parse_composition(self, composition: str) -> list[CompositionDetail]:
 		results = []
