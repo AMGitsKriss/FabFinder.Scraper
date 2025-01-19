@@ -24,6 +24,7 @@ class RabbitReader:
 			try:
 				browser = pw.chromium.launch(headless=False)
 				self.window = browser.new_page()
+				self.window.add_init_script(script='Object.defineProperty(navigator,"webdriver",{get: () => undefined})')
 
 				subscriber = RabbitSubscriberBlocking(
 					queue_name=self.queue,

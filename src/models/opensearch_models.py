@@ -37,8 +37,7 @@ class InventoryItem:
 class Size:
 	value: str
 	fit: str
-	type: str
-
+	kind: str
 
 @dataclass_json
 @dataclass

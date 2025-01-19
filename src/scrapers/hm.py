@@ -75,7 +75,7 @@ class HMScraper(Scraper):
 				product_url = box.get_attribute("href")
 				products.append(product_url)
 				product = DetailsRequestMsg(
-					store_code,
+					self.store_code,
 					product_url,
 					datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
 				)

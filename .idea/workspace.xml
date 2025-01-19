@@ -5,10 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ace769a8-fc7d-4ca4-aae0-176a86ef14ff" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/helpers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/catalog_scraper/rabbit.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/catalog_scraper/rabbit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/details_scraper/rabbit.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/details_scraper/rabbit.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/opensearch_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/opensearch_models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/scrapers/george.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/scrapers/george.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/scrapers/scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/scrapers/scraper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/george_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/george_test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,8 +43,11 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;Python tests.Python tests for george_test.MyTestCase.test_adsa_api_query.executor&quot;: &quot;Debug&quot;,
+    &quot;Python tests.Python tests for george_test.MyTestCase.test_baby_sleep_bag.executor&quot;: &quot;Debug&quot;,
     &quot;Python tests.Python tests for george_test.MyTestCase.test_composition_parser_1.executor&quot;: &quot;Debug&quot;,
+    &quot;Python tests.Python tests for george_test.MyTestCase.test_pyjamas.executor&quot;: &quot;Debug&quot;,
     &quot;Python tests.Python tests for george_test.MyTestCase.test_tights.executor&quot;: &quot;Debug&quot;,
+    &quot;Python tests.Python tests for george_test.MyTestCase.test_tights2.executor&quot;: &quot;Debug&quot;,
     &quot;Python tests.Python tests for hm_test.MyTestCase.executor&quot;: &quot;Run&quot;,
     &quot;Python tests.Python tests for hm_test.MyTestCase.test_bandeau_dress.executor&quot;: &quot;Debug&quot;,
     &quot;Python tests.Python tests for hm_test.MyTestCase.test_hat.executor&quot;: &quot;Debug&quot;,
@@ -103,7 +109,7 @@
     </key>
   </component>
   <component name="RunManager" selected="Python.Details Scraper">
-    <configuration name="Catalog Scraper" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="Catalog Scraper" type="PythonConfigurationType" factoryName="Python">
       <module name="FabFinder.Scraper" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -125,7 +131,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Category Scraper" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="Category Scraper" type="PythonConfigurationType" factoryName="Python">
       <module name="FabFinder.Scraper" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -147,7 +153,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Details Scraper" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="Details Scraper" type="PythonConfigurationType" factoryName="Python">
       <module name="FabFinder.Scraper" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -169,7 +175,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for george_test.MyTestCase.test_adsa_api_query" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests for george_test.MyTestCase.test_baby_sleep_bag" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="FabFinder.Scraper" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -180,11 +186,11 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;george_test.MyTestCase.test_adsa_api_query&quot;" />
+      <option name="_new_target" value="&quot;george_test.MyTestCase.test_baby_sleep_bag&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for ms_test.MyTestCase.test_shoes" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests for george_test.MyTestCase.test_pyjamas" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="FabFinder.Scraper" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -195,25 +201,39 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;ms_test.MyTestCase.test_shoes&quot;" />
+      <option name="_new_target" value="&quot;george_test.MyTestCase.test_pyjamas&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for george_test.MyTestCase.test_tights2" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="FabFinder.Scraper" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;george_test.MyTestCase.test_tights2&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.program" />
       <item itemvalue="Python.Catalog Scraper" />
+      <item itemvalue="Python.program" />
       <item itemvalue="Python.Category Scraper" />
       <item itemvalue="Python.Details Scraper" />
-      <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_adsa_api_query" />
-      <item itemvalue="Python tests.Python tests for ms_test.MyTestCase.test_shoes" />
+      <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_baby_sleep_bag" />
+      <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_pyjamas" />
+      <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_tights2" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.Details Scraper" />
-        <item itemvalue="Python.Catalog Scraper" />
-        <item itemvalue="Python.Category Scraper" />
-        <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_adsa_api_query" />
-        <item itemvalue="Python tests.Python tests for ms_test.MyTestCase.test_shoes" />
+        <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_baby_sleep_bag" />
+        <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_tights2" />
+        <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_pyjamas" />
       </list>
     </recent_temporary>
   </component>
@@ -322,22 +342,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/scrapers/george.py</url>
-          <line>188</line>
+          <line>189</line>
           <option name="timeStamp" value="126" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/scrapers/george.py</url>
-          <line>182</line>
+          <line>183</line>
           <option name="timeStamp" value="127" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/details_scraper/rabbit.py</url>
-          <line>50</line>
+          <line>51</line>
           <option name="timeStamp" value="201" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/catalog_scraper/rabbit.py</url>
-          <line>36</line>
+          <line>37</line>
           <option name="timeStamp" value="248" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -352,13 +372,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/catalog_scraper/rabbit.py</url>
-          <line>52</line>
+          <line>53</line>
           <option name="timeStamp" value="256" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/rabbit_publisher.py</url>
           <line>27</line>
           <option name="timeStamp" value="264" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/test/george_test.py</url>
+          <line>26</line>
+          <option name="timeStamp" value="303" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/test/george_test.py</url>
+          <line>44</line>
+          <option name="timeStamp" value="304" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

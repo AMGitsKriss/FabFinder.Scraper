@@ -9,6 +9,7 @@ from datetime import datetime
 import requests
 from playwright.sync_api import Page
 
+from helpers import Helpers
 from models.opensearch_models import *
 from models.queue_models import DetailsRequestMsg, CatalogueRequestMsg
 from publisher_collection import RabbitPublisherCollection, OpenSearchPublisherCollection
@@ -189,27 +190,34 @@ class GeorgeScraper(Scraper):
 			self.logger.exception("Failed to parse Asda's response.", Url=url, Payload=data)
 			return []
 
-	def get_product_details(self, window: Page, item: str) -> InventoryItem:
+	def get_product_details(self, window: Page, item_string: str) -> InventoryItem:
 		selectors = dict({
 			'sizes': '#main-region > div.main-page-wrapper > div > div > div> div > div > div.buying-block > div.attributes-wrapper > div > div > div[data-id="button-attribute-selector-size"] > span',
 			'colours': '#main-region > div.main-page-wrapper > div > div > div:nth-child(2) > div > div.buying-block-wrapper > div.buying-block > div.attributes-wrapper > div.product-colour-selector.image-swatches-selector.image-swatches-selector-grid-4 > div.colour-wrapper > div.colour.colour-swatch.selected.selectableUnavailable > img'
 		})
 
-		item_bytes = bytes(item, encoding="utf-8")
+		item_bytes = bytes(item_string, encoding="utf-8")
 		item_gzip = base64.b64decode(item_bytes)
 		item_json = gzip.decompress(item_gzip)
 		item = self.AsdaProduct(**json.loads(item_json))
 		store = "Asda"
 
 		window.goto(item.url)
-		window.wait_for_selector(selectors["sizes"])
-
 		self.__check_session(window)
+		fit_sizes = Helpers.query_and_wait_for_selector(window, selectors["sizes"])
+		if not fit_sizes:
+			self.logger.error(
+				msg='Product "{name}" could no longer be read.',
+				name = item.name,
+				url = item.url,
+				store=store)
+			return None
 
-		all_size_combinations = list(Size)
-		fit_sizes = window.locator(selectors["sizes"])
+		all_size_combinations = []
+		# fit_sizes = window.locator(selectors["sizes"])
 		for size_label in fit_sizes.all():
-			parsed_size = self.__parse_size(size_label, item)
+			size_label_txt = size_label.inner_text().lower()
+			parsed_size = self.__parse_size(size_label_txt, item)
 			all_size_combinations.extend(parsed_size)
 
 		colours = []
@@ -255,7 +263,7 @@ class GeorgeScraper(Scraper):
 			store,
 			item.brand,
 			item.current_price,
-			self.__parse_composition(item.fabric_composition),
+			self.__parse_composition(item.fabric_composition), # TODO - If none, get from page.
 			mapper_response.pattern,
 			mapper_response.categories.tags,
 			image_urls,
@@ -272,20 +280,23 @@ class GeorgeScraper(Scraper):
 		return product
 
 	def __parse_size(self, size_text: str, item: InventoryItem) -> list[Size]:
-		results = list(Size)
-
-		child_sizes_regex = r"^[0-9]{1-2}-[0-9]{1-2}$"
+		results: list[Size] = list()
+		child_sizes_regex = r"^\d{1,2}-\d{1,2}$"
 		size_with_fit = r"^\d+[A-Za-z]$"
 		letter_size_regex = r"^[a-zA-Z]$"
-		number_size_regex = r"^[0-9]{1-2}$"
+		number_size_regex = r"^\d{1,2}$"
 
-		# Account for age ranges "10-12"
+		# Account for size ranges "10-12"
 		if re.match(child_sizes_regex, size_text):
-			age_from_to = size_text.split("-")
-			age_from = int(age_from_to[0])
-			age_to = int(age_from_to[1])
-			for age in range(age_from, age_to):
-				results.append(Size(age, "regular", "age"))
+			size_type = "size"
+			if "Yrs" in size_text: size_type = "years"
+			elif "Mths" in size_text: size_type = "months"
+
+			size_from_to = size_text.split("-")
+			size_from = int(size_from_to[0])
+			size_to = int(size_from_to[1])
+			for size in range(size_from, size_to+1):
+				results.append(Size(size, "regular", size_type))
 
 		# Account for shoes "uk8 eu42"
 		elif "uk" in size_text and "eu" in size_text:
@@ -327,6 +338,7 @@ class GeorgeScraper(Scraper):
 
 	def __parse_composition(self, composition: str) -> list[CompositionDetail]:
 		results = []
+		composition = composition or ""
 
 		material_indexes = re.findall(r'\d+% [A-Za-z]+', composition)
 		material_dict = dict()
