@@ -28,6 +28,7 @@ class HMScraper(Scraper):
 	def __init__(self, catalogue_writer: CatalogueWriter, publisher: BasePublisher):
 		self.publisher = publisher
 		self.catalogue_writer = catalogue_writer
+		self.size_parser = Size_Parser(True)
 
 	def get_catalogue(self, window: Page) -> list[str]:
 		product_urls = []

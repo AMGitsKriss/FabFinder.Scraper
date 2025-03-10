@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+import sys
 
 from opensearchpy import OpenSearch
 
@@ -11,6 +12,7 @@ from models.queue_models import DetailsRequestMsg
 
 class OpenSearchWriter(BasePublisher):
 	def __init__(self, index: str):
+		self.logger = logging.getLogger(__name__)
 		self.index = index
 		host = 'localhost'  # TODO - Config
 		port = 9200  # TODO - Config
@@ -29,8 +31,9 @@ class OpenSearchWriter(BasePublisher):
 			self.__create_index()
 
 		except Exception as ex:
-			logging.exception(ex, "Failed to connected to Opensearch")
-
+			self.logger.exception(ex, "Failed to connected to Opensearch")
+			logging.shutdown()
+			sys.exit(1)
 
 	def __create_index(self):
 		if self.index is CATALOGUE_INDEX:
@@ -69,8 +72,7 @@ class OpenSearchWriter(BasePublisher):
 						"pattern": {"type": "keyword"},
 						"categories": {"type": "keyword"},
 						"audiences": {"type": "keyword"},
-						"sizes": {"type": "keyword"},
-						"fit": {"type": "keyword"},
+						# "sizes": {"type": "array"},
 						"colour": {"type": "keyword"},
 						"origin": {"type": "keyword"},
 						"creation_time": {"type": "date"}
@@ -81,7 +83,7 @@ class OpenSearchWriter(BasePublisher):
 
 	def publish(self, data):
 		try:
-			identity_field:str = ""
+			identity_field: str = ""
 			if type(data) is DetailsRequestMsg:
 				identity_field = data.store_id
 			elif type(data) is InventoryItem:
@@ -96,6 +98,6 @@ class OpenSearchWriter(BasePublisher):
 
 			# TODO - Error handling.
 			if response is None:
-				logging.error("Failed to write document to Opensearch", document=data)
+				self.logger.error("Failed to write document to Opensearch", document=data)
 		except Exception as ex:
-			logging.exception("Opensearch client threw an exception")
+			self.logger.exception("Opensearch client threw an exception")

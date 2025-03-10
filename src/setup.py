@@ -10,7 +10,6 @@ from scrapers.mock import MockScraper
 from scrapers.ms import MSScraper
 from scrapers.scraper import Scraper
 
-
 class LogInstaller:
 	@staticmethod
 	def install():
@@ -31,6 +30,26 @@ class LogInstaller:
 		seqlog.set_global_log_properties(
 			Application="FabFinder.Scraper"
 		)
+
+		# seq_handler = seqlog.SeqLogHandler(
+		# 	server_url="http://localhost:5341/",
+		# 	api_key="hXvwBIJLTrvAURu3kbnU",
+		# 	batch_size=10,
+		# 	auto_flush_timeout=10,  # seconds
+		# 	json_encoder_class=json.encoder.JSONEncoder
+		# )
+		#
+		# seqlog.set_callback_on_failure(LogInstaller.log_to_console)
+		# seqlog.set_global_log_properties(
+		# 	Application="FabFinder.Scraper"
+		# )
+		#
+		# root_logger = logging.getLogger()
+		# root_logger.propagate = True
+		# while root_logger.handlers:
+		# 	root_logger.handlers.pop()
+		# root_logger.addHandler(seq_handler)
+		# root_logger.setLevel(logging.INFO)
 
 	@staticmethod
 	def log_to_console(e):  # type: (requests.RequestException) -> None

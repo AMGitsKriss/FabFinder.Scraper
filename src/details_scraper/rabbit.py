@@ -1,6 +1,8 @@
 import json
 import logging
+import sys
 import time
+import traceback
 
 from playwright.sync_api import sync_playwright, Page
 
@@ -18,6 +20,7 @@ class RabbitReader:
 		self.exchange = exchange
 		self.queue = queue
 		self.scrapers = scrapers
+		self.logger = logging.getLogger(__name__)
 
 	def run(self):
 		with sync_playwright() as pw:
@@ -31,16 +34,28 @@ class RabbitReader:
 			)
 			subscriber.start()
 
+			pika_logger = logging.getLogger('pika')
+			pika_logger.propagate = True
+
 			while subscriber.is_running():
 				time.sleep(5)  # TODO - Config
 
 	def catalogue_callback(self, channel, method, properties, message_b):
 		message = DetailsRequestMsg(**json.loads(message_b))
+		self.logger.info("Getting details for product: {storeCode} {storeId}", storeCode=message.store_code,
+						 storeId=message.store_id)
 		scraper = self.scrapers[message.store_code]
-		if not self.read_product_details(self.window, scraper, message):
-			channel.basic_reject(method.delivery_tag)
-		else:
-			channel.basic_ack(method.delivery_tag)
+		try:
+			if not self.read_product_details(self.window, scraper, message):
+				channel.basic_reject(method.delivery_tag)
+			else:
+				channel.basic_ack(method.delivery_tag)
+		except Exception as ex:
+			store = type(scraper).__name__
+			handlers = self.logger.handlers
+			self.logger.exception("Failed to read {store} catalogue.", store)
+			logging.shutdown()
+			sys.exit(1)
 
 	def read_product_details(self, window: Page, scraper: Scraper, message: DetailsRequestMsg):
 		try:
@@ -48,6 +63,6 @@ class RabbitReader:
 			return True
 		except Exception as ex:
 			store = type(scraper).__name__
-			logging.exception("Failed to read {store} catalogue.", store)
-			print(f"Failed to read {store} catalogue.")
+			self.logger.exception("Failed to read {store} catalogue.", store)
+			print(traceback.format_exc())
 		return False

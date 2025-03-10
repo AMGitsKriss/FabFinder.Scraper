@@ -8,6 +8,12 @@ class CompositionDetail:
 	title: str
 	composition: dict
 
+@dataclass_json
+@dataclass
+class Size:
+	value: str
+	fit: str
+	kind: str
 
 @dataclass_json
 @dataclass
@@ -25,19 +31,11 @@ class InventoryItem:
 	categories: list[str]
 	image_urls: list[str]
 	audiences: list[str]
-	sizes: list[str]
+	sizes: list[Size]
 	colour: list[str]
 	tags: list[str]
 	origin: str
 	creation_time: str
-
-
-@dataclass_json
-@dataclass
-class Size:
-	value: str
-	fit: str
-	kind: str
 
 @dataclass_json
 @dataclass

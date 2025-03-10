@@ -12,6 +12,7 @@ from playwright.sync_api import Page
 from helpers import Helpers
 from models.opensearch_models import *
 from models.queue_models import DetailsRequestMsg, CatalogueRequestMsg
+from parsers import Size_Parser
 from publisher_collection import RabbitPublisherCollection, OpenSearchPublisherCollection
 from scrapers.scraper import Scraper
 from config import *
@@ -37,6 +38,7 @@ class GeorgeScraper(Scraper):
 		self.rabbit_publisher = rabbit_publisher
 		self.opensearch_publisher = opensearch_publisher
 		self.logger = logging.getLogger(__name__)
+		self.size_parser = Size_Parser(True)
 
 	@dataclass_json
 	@dataclass
@@ -193,7 +195,7 @@ class GeorgeScraper(Scraper):
 	def get_product_details(self, window: Page, item_string: str) -> InventoryItem:
 		selectors = dict({
 			'sizes': '#main-region > div.main-page-wrapper > div > div > div> div > div > div.buying-block > div.attributes-wrapper > div > div > div[data-id="button-attribute-selector-size"] > span',
-			'colours': '#main-region > div.main-page-wrapper > div > div > div:nth-child(2) > div > div.buying-block-wrapper > div.buying-block > div.attributes-wrapper > div.product-colour-selector.image-swatches-selector.image-swatches-selector-grid-4 > div.colour-wrapper > div.colour.colour-swatch.selected.selectableUnavailable > img'
+			'colours': '#main-region > div.main-page-wrapper > div > div > div:nth-child(2) > div > div.buying-block-wrapper > div.buying-block > div.attributes-wrapper > div.product-colour-selector.image-swatches-selector.image-swatches-selector-grid-4 > div.colour-wrapper > div.colour.colour-swatch.selectableUnavailable > img'
 		})
 
 		item_bytes = bytes(item_string, encoding="utf-8")
@@ -208,16 +210,15 @@ class GeorgeScraper(Scraper):
 		if not fit_sizes:
 			self.logger.error(
 				msg='Product "{name}" could no longer be read.',
-				name = item.name,
-				url = item.url,
+				name=item.name,
+				url=item.url,
 				store=store)
 			return None
 
 		all_size_combinations = []
-		# fit_sizes = window.locator(selectors["sizes"])
-		for size_label in fit_sizes.all():
+		for size_label in fit_sizes:
 			size_label_txt = size_label.inner_text().lower()
-			parsed_size = self.__parse_size(size_label_txt, item)
+			parsed_size = self.size_parser.parse(size_label_txt, item)
 			all_size_combinations.extend(parsed_size)
 
 		colours = []
@@ -263,7 +264,7 @@ class GeorgeScraper(Scraper):
 			store,
 			item.brand,
 			item.current_price,
-			self.__parse_composition(item.fabric_composition), # TODO - If none, get from page.
+			self.__parse_composition(item.fabric_composition),  # TODO - If none, get from page.
 			mapper_response.pattern,
 			mapper_response.categories.tags,
 			image_urls,
@@ -278,63 +279,6 @@ class GeorgeScraper(Scraper):
 		self.opensearch_publisher.get(DETAILS_INDEX).publish(product)
 
 		return product
-
-	def __parse_size(self, size_text: str, item: InventoryItem) -> list[Size]:
-		results: list[Size] = list()
-		child_sizes_regex = r"^\d{1,2}-\d{1,2}$"
-		size_with_fit = r"^\d+[A-Za-z]$"
-		letter_size_regex = r"^[a-zA-Z]$"
-		number_size_regex = r"^\d{1,2}$"
-
-		# Account for size ranges "10-12"
-		if re.match(child_sizes_regex, size_text):
-			size_type = "size"
-			if "Yrs" in size_text: size_type = "years"
-			elif "Mths" in size_text: size_type = "months"
-
-			size_from_to = size_text.split("-")
-			size_from = int(size_from_to[0])
-			size_to = int(size_from_to[1])
-			for size in range(size_from, size_to+1):
-				results.append(Size(size, "regular", size_type))
-
-		# Account for shoes "uk8 eu42"
-		elif "uk" in size_text and "eu" in size_text:
-			size_units = size_text.split(" ")
-			for unit in size_units:
-				number = re.sub("[^0-9]", "", unit)
-				country = re.sub("[^a-zA-Z]", "", unit)
-				results.append(Size(number, country, "shoes"))
-
-		# Account for fits "32R"
-		elif re.match(size_with_fit, size_text):
-			number = re.sub("[^0-9]", "", size_text)
-			fit = re.sub("[^a-zA-Z]", "", size_text)
-			if number != "" and fit == "r":
-				fit = "regular"
-			elif number != "" and fit == "s":
-				fit = "short"
-			elif number != "" and fit == "t":
-				fit = "tall"
-			elif number != "" and fit == "l":
-				fit = "long"
-			else:
-				self.logger.warning(f"There was no mapped fit for the string '{fit}' on {item.url}")
-				fit = "regular"
-			results.append(Size(number, fit, "size"))
-
-		# Account for letters "M"
-		elif re.match(letter_size_regex, size_text):
-			results.append(Size(size_with_fit, "regular", "size"))
-
-		# Account for numbers "10"
-		elif re.match(number_size_regex, size_text):
-			results.append(Size(size_with_fit, "regular", "size"))
-
-		else:
-			self.logger.warning(f"There was no mapped size for the size '{size_text}' on {item.url}")
-
-		return results
 
 	def __parse_composition(self, composition: str) -> list[CompositionDetail]:
 		results = []
@@ -358,3 +302,4 @@ class GeorgeScraper(Scraper):
 			window.wait_for_selector(cookies)
 			window.locator(cookies).click()
 			self.new_session = False
+

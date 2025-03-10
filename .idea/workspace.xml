@@ -5,12 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ace769a8-fc7d-4ca4-aae0-176a86ef14ff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/helpers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/parsers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/size_parser_test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/catalog_scraper/rabbit.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/catalog_scraper/rabbit.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/details_scraper/rabbit.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/details_scraper/rabbit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/helpers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/opensearch_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/opensearch_models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/opensearch.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/opensearch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rabbit_publisher.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbit_publisher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rabbit_subscriber.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/rabbit_subscriber.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/scrapers/george.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/scrapers/george.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/scrapers/hm.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/scrapers/hm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/setup.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/george_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/george_test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -40,61 +46,70 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python tests.Python tests for george_test.MyTestCase.test_adsa_api_query.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for george_test.MyTestCase.test_baby_sleep_bag.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for george_test.MyTestCase.test_composition_parser_1.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for george_test.MyTestCase.test_pyjamas.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for george_test.MyTestCase.test_tights.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for george_test.MyTestCase.test_tights2.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for hm_test.MyTestCase.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for hm_test.MyTestCase.test_bandeau_dress.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for hm_test.MyTestCase.test_hat.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for hm_test.MyTestCase.test_no_description_name_brand.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for hm_test.MyTestCase.test_tshirt.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_bikini.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_bikini2.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_catalogue_page.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_composition_parser.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_composition_parser_1.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_composition_parser_2.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_composition_parser_3.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_composition_parser_4.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_composition_parser_5.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_hoodie.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_jeans.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_joggers.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_kids_backpack.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_knickers.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_linen_blouse.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_midi_dress.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_polo.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_printed_blouse.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_printed_knickers.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_sequence.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_shoes.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_socks.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Python tests for ms_test.MyTestCase.test_tshirt.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.Unittests for hm_test.MyTestCase.test_no_description.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.Catalog Scraper.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.Category Scraper.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.Details Scraper.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.opensearch.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.program (1).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.program (2).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.program.executor&quot;: &quot;Run&quot;,
-    &quot;Python.rabbit_example.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.rabbittest.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Kriss/Desktop/FabFinder Dev/FabFinder.Scraper/src&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.Confirmation&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python tests.Python tests for george_test.MyTestCase.test_adsa_api_query.executor": "Debug",
+    "Python tests.Python tests for george_test.MyTestCase.test_baby_sleep_bag.executor": "Debug",
+    "Python tests.Python tests for george_test.MyTestCase.test_composition_parser_1.executor": "Debug",
+    "Python tests.Python tests for george_test.MyTestCase.test_pyjamas.executor": "Debug",
+    "Python tests.Python tests for george_test.MyTestCase.test_tights.executor": "Debug",
+    "Python tests.Python tests for george_test.MyTestCase.test_tights2.executor": "Debug",
+    "Python tests.Python tests for hm_test.MyTestCase.executor": "Run",
+    "Python tests.Python tests for hm_test.MyTestCase.test_bandeau_dress.executor": "Debug",
+    "Python tests.Python tests for hm_test.MyTestCase.test_hat.executor": "Debug",
+    "Python tests.Python tests for hm_test.MyTestCase.test_no_description_name_brand.executor": "Debug",
+    "Python tests.Python tests for hm_test.MyTestCase.test_tshirt.executor": "Debug",
+    "Python tests.Python tests for logging_test.MyTestCase.test_tshirt.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.executor": "Run",
+    "Python tests.Python tests for ms_test.MyTestCase.test_bikini.executor": "Run",
+    "Python tests.Python tests for ms_test.MyTestCase.test_bikini2.executor": "Run",
+    "Python tests.Python tests for ms_test.MyTestCase.test_catalogue_page.executor": "Run",
+    "Python tests.Python tests for ms_test.MyTestCase.test_composition_parser.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_composition_parser_1.executor": "Run",
+    "Python tests.Python tests for ms_test.MyTestCase.test_composition_parser_2.executor": "Run",
+    "Python tests.Python tests for ms_test.MyTestCase.test_composition_parser_3.executor": "Run",
+    "Python tests.Python tests for ms_test.MyTestCase.test_composition_parser_4.executor": "Run",
+    "Python tests.Python tests for ms_test.MyTestCase.test_composition_parser_5.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_hoodie.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_jeans.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_joggers.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_kids_backpack.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_knickers.executor": "Run",
+    "Python tests.Python tests for ms_test.MyTestCase.test_linen_blouse.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_midi_dress.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_polo.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_printed_blouse.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_printed_knickers.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_sequence.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_shoes.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_socks.executor": "Debug",
+    "Python tests.Python tests for ms_test.MyTestCase.test_tshirt.executor": "Debug",
+    "Python tests.Python tests for size_parser_test.SizeParserTests.executor": "Run",
+    "Python tests.Python tests for size_parser_test.SizeParserTests.test_0_3_moths_size.executor": "Debug",
+    "Python tests.Python tests for size_parser_test.SizeParserTests.test_12_15_years_size.executor": "Run",
+    "Python tests.Python tests for size_parser_test.SizeParserTests.test_32c_size.executor": "Run",
+    "Python tests.Python tests for size_parser_test.SizeParserTests.test_32r_size.executor": "Run",
+    "Python tests.Python tests for size_parser_test.SizeParserTests.test_8uk_42eu_size.executor": "Run",
+    "Python tests.Python tests for size_parser_test.SizeParserTests.test_sizes.executor": "Debug",
+    "Python tests.Python tests for test_size_parser_test.SizeParserTests.test_sizes.executor": "Debug",
+    "Python tests.Unittests for hm_test.MyTestCase.test_no_description.executor": "Debug",
+    "Python.Catalog Scraper.executor": "Debug",
+    "Python.Category Scraper.executor": "Debug",
+    "Python.Details Scraper.executor": "Debug",
+    "Python.opensearch.executor": "Debug",
+    "Python.program (1).executor": "Debug",
+    "Python.program (2).executor": "Debug",
+    "Python.program.executor": "Run",
+    "Python.rabbit_example.executor": "Debug",
+    "Python.rabbittest.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/Kriss/Desktop/FabFinder Dev/FabFinder.Scraper/src",
+    "settings.editor.selected.configurable": "project.propVCSSupport.Confirmation"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Kriss\Desktop\FabFinder Dev\FabFinder.Scraper\src" />
@@ -108,7 +123,7 @@
       <recent name="C:\Users\Kriss\Desktop\FabFinder Dev\FabFinder.Scraper\src\queue" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Details Scraper">
+  <component name="RunManager" selected="Python tests.Python tests for size_parser_test.SizeParserTests">
     <configuration name="Catalog Scraper" type="PythonConfigurationType" factoryName="Python">
       <module name="FabFinder.Scraper" />
       <option name="ENV_FILES" value="" />
@@ -175,7 +190,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for george_test.MyTestCase.test_baby_sleep_bag" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests for size_parser_test.SizeParserTests" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="FabFinder.Scraper" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -186,11 +201,11 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;george_test.MyTestCase.test_baby_sleep_bag&quot;" />
+      <option name="_new_target" value="&quot;size_parser_test.SizeParserTests&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for george_test.MyTestCase.test_pyjamas" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests for size_parser_test.SizeParserTests.test_0_3_moths_size" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="FabFinder.Scraper" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -201,11 +216,11 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;george_test.MyTestCase.test_pyjamas&quot;" />
+      <option name="_new_target" value="&quot;size_parser_test.SizeParserTests.test_0_3_moths_size&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for george_test.MyTestCase.test_tights2" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests for size_parser_test.SizeParserTests.test_12_15_years_size" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="FabFinder.Scraper" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -216,7 +231,37 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;george_test.MyTestCase.test_tights2&quot;" />
+      <option name="_new_target" value="&quot;size_parser_test.SizeParserTests.test_12_15_years_size&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for size_parser_test.SizeParserTests.test_32c_size" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="FabFinder.Scraper" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;size_parser_test.SizeParserTests.test_32c_size&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for size_parser_test.SizeParserTests.test_8uk_42eu_size" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="FabFinder.Scraper" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;size_parser_test.SizeParserTests.test_8uk_42eu_size&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
@@ -225,15 +270,19 @@
       <item itemvalue="Python.program" />
       <item itemvalue="Python.Category Scraper" />
       <item itemvalue="Python.Details Scraper" />
-      <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_baby_sleep_bag" />
-      <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_pyjamas" />
-      <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_tights2" />
+      <item itemvalue="Python tests.Python tests for size_parser_test.SizeParserTests" />
+      <item itemvalue="Python tests.Python tests for size_parser_test.SizeParserTests.test_0_3_moths_size" />
+      <item itemvalue="Python tests.Python tests for size_parser_test.SizeParserTests.test_12_15_years_size" />
+      <item itemvalue="Python tests.Python tests for size_parser_test.SizeParserTests.test_32c_size" />
+      <item itemvalue="Python tests.Python tests for size_parser_test.SizeParserTests.test_8uk_42eu_size" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_baby_sleep_bag" />
-        <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_tights2" />
-        <item itemvalue="Python tests.Python tests for george_test.MyTestCase.test_pyjamas" />
+        <item itemvalue="Python tests.Python tests for size_parser_test.SizeParserTests" />
+        <item itemvalue="Python tests.Python tests for size_parser_test.SizeParserTests.test_12_15_years_size" />
+        <item itemvalue="Python tests.Python tests for size_parser_test.SizeParserTests.test_32c_size" />
+        <item itemvalue="Python tests.Python tests for size_parser_test.SizeParserTests.test_0_3_moths_size" />
+        <item itemvalue="Python tests.Python tests for size_parser_test.SizeParserTests.test_8uk_42eu_size" />
       </list>
     </recent_temporary>
   </component>
@@ -302,7 +351,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/scrapers/hm.py</url>
-          <line>167</line>
+          <line>168</line>
           <option name="timeStamp" value="68" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -342,18 +391,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/scrapers/george.py</url>
-          <line>189</line>
+          <line>191</line>
           <option name="timeStamp" value="126" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/scrapers/george.py</url>
-          <line>183</line>
+          <line>185</line>
           <option name="timeStamp" value="127" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/details_scraper/rabbit.py</url>
-          <line>51</line>
-          <option name="timeStamp" value="201" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/catalog_scraper/rabbit.py</url>
@@ -377,7 +421,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/rabbit_publisher.py</url>
-          <line>27</line>
+          <line>36</line>
           <option name="timeStamp" value="264" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -389,6 +433,26 @@
           <url>file://$PROJECT_DIR$/test/george_test.py</url>
           <line>44</line>
           <option name="timeStamp" value="304" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/opensearch.py</url>
+          <line>35</line>
+          <option name="timeStamp" value="335" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/details_scraper/rabbit.py</url>
+          <line>56</line>
+          <option name="timeStamp" value="340" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/opensearch.py</url>
+          <line>102</line>
+          <option name="timeStamp" value="341" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/test/size_parser_test.py</url>
+          <line>25</line>
+          <option name="timeStamp" value="350" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

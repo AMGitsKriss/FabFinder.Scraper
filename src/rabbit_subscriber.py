@@ -14,6 +14,7 @@ class RabbitSubscriberBlocking:
 		self.channel = self.connection.channel()
 
 		self.channel.queue_declare(queue = queue_name, durable=True, exclusive=False, auto_delete=False)
+		self.channel.basic_qos(prefetch_count=10)
 		self.channel.basic_consume(queue=queue_name,
 								   auto_ack=False,
 								   on_message_callback=queue_callback)

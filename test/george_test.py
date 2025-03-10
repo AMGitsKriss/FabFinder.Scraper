@@ -66,3 +66,17 @@ class MyTestCase(unittest.TestCase):
 				"H4sIALMXg2cC/11SXWsbMRD8K0LQN+c+e8YNpRCH4Ly4L+lbUw6dtJZFdNKxWj1cS/97JeGkcUAINDs7mh3pD49o+S3jZ6Il3Na1MgiSKhGUqKSfaw0eNdTN0PbDrh+GjYKTiJY2i6rONFu+YVxGRHA0LmgkJLF2qJoEL+hVlDQalS94U8gdTsyZyA8IK3sigewYgzWOPVmAhe2FZl01sB9eF31vfcRXfkaC+V36291Nv2VH7+gc+LsraV1KvcgZp7NiIQRaba64aG06TihccXcoY7JHn3wl3HqnRwVBolnIeJcpz7Fruo5lC18nZPW3Z3eBslXy+gPaNs0nJj1Rai/WzCxwHdOui7eh2fbN7kvX7vptCSWA9E69cUIi/bxmjXeZdw3t+a+EzSbI0biT/z/bSUzpPcb0iIsP5jLFpabBKSiJ7sVUEp2ifAEar6Mukb1mmZlsD0qlPEtG4DSdP2reCwLtcS3mS8v3iAESUGyKQICXH3F4OLbN8Dkt/vcf87k/UogCAAA="
 			)
 		assert product is not None
+
+	def test_baby_hat_one_Size_many_colours(self):
+		with sync_playwright() as pw:
+			browser = pw.chromium.launch(headless=False)
+			context = browser.new_context(viewport={"width": 1280, "height": 720})
+			window = context.new_page()
+			window.add_init_script(script='Object.defineProperty(navigator,"webdriver",{get: () => undefined})')
+			product = self.scraper.get_product_details(
+				window,
+				"H4sIAFY1jGcC/21SYWvbMBD9K8Kwb1nsOHWpwxi0ZbRfMgLbPjXDyNLFOSJL5nSm88b++yS5adduX4y5e/fevXf6lY1kso3IjsyD3+S5RgLFS+m1XCrX5x046iC/+7Stq6v6qny/LtfV6nK90HCQo+HFoJdH7k22EJkaicByMxAqCKRlqA3k9Ki4QR1V/qGJY1b2EZ3t0J7EFi2Ke5DE4tYxOytuZDuJz/DYOrLiXrIXpdhJdUqKzriR/jMcmx5/Rl47GvPXIjwNSS0yJRRPJhYesm2wg0Nk/h7qLUk775wSiFDjbNdo8IpwYHQ2dvdjWZTlnksRJz+0JPKPe3uufnEHFir5eNvaEVoWQUMMRqIVgRc7K1xi9m/RX8dgvg0KAvS8TAi5lzQ14dslQ1VR1av6oiiry3WdnIFyVj9jfDL5CtVcJ6s9etWgPbiXtA6yDUdswgsYnMez2ZDZRqyK4t3TbaJKB1ZDOkE8VKy0ozoBN69vk7I+Z59Oeq0UeO8IIfUM2I6PLxvMvLeSoXM0pd1v3JSgd0gm/Xyz6OHH7EF6BpqfWWT4/Qf/Ss6g2gIAAA=="
+			)
+		assert product is not None
+		assert len(product.colour) is 4
+		assert len(product.sizes) is 1
