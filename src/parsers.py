@@ -16,8 +16,6 @@ class Size_Parser:
 		self.enable_logging = enable_logging
 
 	def parse(self, size_text: str) -> list[Size]:
-		TmpSizeWrite.write(size_text)
-
 		results: list[Size] = list()
 		size_range_regex = r"^([0-9]*[.])?[0-9]+-([0-9]*[.])?[0-9]+"
 		# size_range_regex = r"^\d{1,2}-\d{1,2}"
@@ -75,11 +73,11 @@ class Size_Parser:
 
 		# Account for letters "M"
 		elif re.match(letter_size_regex, size_text):
-			results.append(Size(size_with_fit, "regular", self.KIND_SIZE))
+			results.append(Size(size_text, "regular", self.KIND_SIZE))
 
 		# Account for numbers "10"
 		elif re.match(number_size_regex, size_text):
-			results.append(Size(size_with_fit, "regular", self.KIND_SIZE))
+			results.append(Size(size_text, "regular", self.KIND_SIZE))
 
 		elif size_text.lower() == "one size":
 			results.append(Size("one size", "regular", self.KIND_SIZE))
@@ -90,22 +88,3 @@ class Size_Parser:
 			if self.enable_logging: self.logger.warning(f"There was no mapped size for the size '{size_text}'")
 
 		return results
-
-
-class TmpSizeWrite:
-	def write(size: str):
-		if size.strip() is "":
-			return
-
-		size = size.strip() + "\n"
-
-		try:
-			with open("sizes.txt", 'r') as file:
-				sizes = list(set(file.readlines()))
-		except FileNotFoundError:
-			sizes = []
-
-		with open('sizes.txt', 'a') as f:
-			if size not in sizes:
-				f.write(size)
-				sizes.append(size)

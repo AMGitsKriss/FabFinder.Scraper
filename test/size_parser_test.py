@@ -18,6 +18,7 @@ class SizeParserTests(unittest.TestCase):
 	def test_0_3_months_size(self): self.__test_sizes(	"0-3 months", 	4, 	Size_Parser.KIND_MONTHS)
 	def test_12_14_yrs_size(self): self.__test_sizes(	"12-14 yrs", 	3, 	Size_Parser.KIND_YEARS)
 	def test_12_14_years_size(self): self.__test_sizes(	"12-14 years",	3, 	Size_Parser.KIND_YEARS)
+	def test_12_14_years_size(self): self.__test_sizes(	"xs",	1, 	Size_Parser.KIND_SIZE)
 
 	def __test_sizes(self, text: str, expected_count: int, expected_kind: str):
 		output = self.parser.parse(text)

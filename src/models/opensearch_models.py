@@ -34,7 +34,7 @@ class InventoryItem:
 	sizes: list[Size]
 	colour: list[str]
 	tags: list[str]
-	origin: str
+	origin: list[str]
 	creation_time: str
 
 @dataclass_json

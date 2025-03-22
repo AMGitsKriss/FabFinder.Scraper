@@ -87,7 +87,7 @@ class GeorgeScraper(Scraper):
 		# Next Page!
 		if len(product_zips) == self.products_per_page:
 			category_msg.page += 1
-			self.rabbit_publisher.get(CATALOGUE_TRIGGER).publish(category_msg)
+			self.rabbit_publisher.get(DETAILS_TRIGGER).publish(category_msg)
 
 		return product_zips
 
@@ -122,7 +122,7 @@ class GeorgeScraper(Scraper):
 
 		return products
 
-	def __query_products(self, page_no: int, category: str) -> list:
+	def __query_products(self, page_no: int, category: str, product_id: str = None) -> list:
 		url = f"https://1kbyj8sz65-dsn.algolia.net/1/indexes/*/queries?x-algolia-agent=Algolia%20for%20JavaScript%20(4.19.0)%3B%20Browser%20(lite)&x-algolia-api-key=dd461e21f405d468acf940750f588f80&x-algolia-application-id=1KBYJ8SZ65"
 		try:
 			headers = {
@@ -137,12 +137,12 @@ class GeorgeScraper(Scraper):
 				"hitsPerPage": f"{self.products_per_page}",
 				"page": f"{page_no}",
 				"facets": "[\"*\"]",
-				"facetFilters": "[]",
+				"facetFilters": "[]"
 				"facetingAfterDistinct": "false",
 				"explain": "*",
 				"clickAnalytics": "true",
 				"userToken": "",
-				"filters": f"online:true AND (in_stock:true OR searchable_if_unavailable:true) AND searchable:true AND hasVG:false AND online_from<=1722679787647 AND (online_to=0 OR online_to >= 1722679787647) AND categories:{category}"
+				"filters": "online:true AND (in_stock:true OR searchable_if_unavailable:true) AND searchable:true AND hasVG:false AND online_from<=1722679787647 AND (online_to=0 OR online_to >= 1722679787647) AND " + (f"categories:{category}" if product_id == None else f"")
 			}
 
 			data = {
@@ -194,7 +194,7 @@ class GeorgeScraper(Scraper):
 
 	def get_product_details(self, window: Page, item_string: str) -> InventoryItem:
 		selectors = dict({
-			'sizes': '#main-region > div.main-page-wrapper > div > div > div> div > div > div.buying-block > div.attributes-wrapper > div > div > div[data-id="button-attribute-selector-size"] > span',
+			'sizes': '#main-region > div.main-page-wrapper > div > div > div > div > div > div.buying-block > div.attributes-wrapper > div > div.attribute-wrapper > div > span:nth-child(2)',
 			'colours': '#main-region > div.main-page-wrapper > div > div > div:nth-child(2) > div > div.buying-block-wrapper > div.buying-block > div.attributes-wrapper > div.product-colour-selector.image-swatches-selector.image-swatches-selector-grid-4 > div.colour-wrapper > div.colour.colour-swatch.selectableUnavailable > img'
 		})
 
@@ -218,7 +218,7 @@ class GeorgeScraper(Scraper):
 		all_size_combinations = []
 		for size_label in fit_sizes:
 			size_label_txt = size_label.inner_text().lower()
-			parsed_size = self.size_parser.parse(size_label_txt, item)
+			parsed_size = self.size_parser.parse(size_label_txt)
 			all_size_combinations.extend(parsed_size)
 
 		colours = []
@@ -272,7 +272,7 @@ class GeorgeScraper(Scraper):
 			all_size_combinations,
 			mapper_response.colours.tags,
 			mapper_response.tags.tags,
-			"unknown",
+			["unknown"],
 			creation_time=datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
 		)
 
